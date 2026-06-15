@@ -121,6 +121,52 @@ function mbh_admin_notices(): void {
 			. esc_html__( 'MailPoet Bounce Handler: la extensión PHP imap no está disponible. El plugin no puede conectarse al buzón de correo.', 'mailpoet-bounce-handler' )
 			. '</p></div>';
 	}
+
+	$policy_bounces = get_transient( 'mbh_policy_alert' );
+	if ( ! empty( $policy_bounces ) && current_user_can( 'manage_options' ) ) {
+		$count       = count( $policy_bounces );
+		$log_url     = admin_url( 'admin.php?page=mbh-log' );
+		$dismiss_url = wp_nonce_url(
+			admin_url( 'admin.php?page=mbh-settings&mbh_dismiss_policy=1' ),
+			'mbh_dismiss_policy'
+		);
+
+		echo '<div class="notice notice-warning"><p>'
+			. '<strong>' . esc_html__( 'MailPoet Bounce Handler — Alerta de bloqueo por política', 'mailpoet-bounce-handler' ) . '</strong><br>'
+			. esc_html(
+				sprintf(
+					/* translators: %d: número de rebotes por política detectados */
+					_n(
+						'Se ha detectado %d rebote por política/reputación (blacklist, spam o bloqueo del servidor). El suscriptor NO ha sido marcado como bounced. Revisa la reputación de tu servidor de envío.',
+						'Se han detectado %d rebotes por política/reputación (blacklist, spam o bloqueo del servidor). Los suscriptores NO han sido marcados como bounced. Revisa la reputación de tu servidor de envío.',
+						$count,
+						'mailpoet-bounce-handler'
+					),
+					$count
+				)
+			)
+			. ' <a href="' . esc_url( $log_url ) . '">' . esc_html__( 'Ver log', 'mailpoet-bounce-handler' ) . '</a>'
+			. ' &nbsp; <a href="' . esc_url( $dismiss_url ) . '">' . esc_html__( 'Descartar', 'mailpoet-bounce-handler' ) . '</a>'
+			. '</p></div>';
+	}
+}
+
+add_action( 'admin_init', 'mbh_handle_policy_dismiss' );
+
+/**
+ * Procesa el descarte manual de la alerta de policy bounces.
+ */
+function mbh_handle_policy_dismiss(): void {
+	if (
+		isset( $_GET['mbh_dismiss_policy'] ) &&
+		isset( $_GET['_wpnonce'] ) &&
+		wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'mbh_dismiss_policy' ) &&
+		current_user_can( 'manage_options' )
+	) {
+		delete_transient( 'mbh_policy_alert' );
+		wp_safe_redirect( admin_url( 'admin.php?page=mbh-settings' ) );
+		exit;
+	}
 }
 
 // ─── Cron ─────────────────────────────────────────────────────────────────────
@@ -197,6 +243,7 @@ function mbh_run_bounce_processing(): array {
 		'hard'                   => array(),
 		'soft'                   => array(),
 		'soft_threshold_reached' => array(),
+		'policy'                 => array(),
 	);
 
 	foreach ( $messages as $message ) {
@@ -263,6 +310,21 @@ function mbh_run_bounce_processing(): array {
 
 				$results['soft'][] = array( 'email' => $email );
 			}
+		} elseif ( 'policy' === $type ) {
+			// Bloqueo por política/reputación: no marcar el suscriptor, solo registrar y alertar.
+			$logger->log_bounce(
+				array(
+					'email'         => $email,
+					'bounce_type'   => 'soft',
+					'soft_count'    => 0,
+					'action_taken'  => 'policy_block',
+					'status_before' => '',
+					'status_after'  => '',
+					'raw_subject'   => $subject,
+				)
+			);
+
+			$results['policy'][] = array( 'email' => $email );
 		}
 
 		$reader->delete_message( $message['num'] );
@@ -270,6 +332,17 @@ function mbh_run_bounce_processing(): array {
 
 	$reader->close();
 	$logger->purge_old_logs();
+
+	if ( ! empty( $results['policy'] ) ) {
+		// Acumular alertas de policy en el transient existente para mostrar en el admin.
+		$existing        = get_transient( 'mbh_policy_alert' );
+		$existing        = ! empty( $existing ) ? $existing : array();
+		$combined        = array_merge( $existing, $results['policy'] );
+		$unique_emails   = array_values( array_unique( array_column( $combined, 'email' ) ) );
+		$unique_combined = array_map( static fn( $e ) => array( 'email' => $e ), $unique_emails );
+		set_transient( 'mbh_policy_alert', $unique_combined, 30 * DAY_IN_SECONDS );
+	}
+
 	$notifier->send_summary( $results );
 
 	return $results;

@@ -29,6 +29,39 @@ class MBH_Bounce_Parser {
 	);
 
 	/**
+	 * Subcódigos DSN 5.x.x que indican dirección inexistente (hard bounce definitivo).
+	 * Resto de 5.x.x se trata como policy si hay indicios, o soft por defecto.
+	 *
+	 * @var int[]
+	 */
+	private const HARD_DSN_SUBCATEGORIES = array( 1, 2 ); // 5.1.x y 5.2.x
+
+	/**
+	 * Subcódigos DSN 5.x.x que indican rechazo por política/reputación.
+	 *
+	 * @var int[]
+	 */
+	private const POLICY_DSN_SUBCATEGORIES = array( 3, 4, 7 ); // 5.3.x, 5.4.x, 5.7.x
+
+	/**
+	 * Palabras clave en el cuerpo que indican bloqueo por política/reputación.
+	 *
+	 * @var string[]
+	 */
+	private const POLICY_KEYWORDS = array(
+		'blocked',
+		'blacklist',
+		'blocklist',
+		'denylist',
+		'spam',
+		'policy',
+		'banned',
+		'rejected due to',
+		'sender reputation',
+		'abuse',
+	);
+
+	/**
 	 * Analiza un mensaje y extrae email destinatario y tipo de bounce.
 	 *
 	 * @param array $message Array con claves 'header' (object) y 'body' (string).
@@ -108,41 +141,82 @@ class MBH_Bounce_Parser {
 	}
 
 	/**
-	 * Determina si el bounce es hard o soft a partir del código de estado DSN.
+	 * Determina el tipo de bounce a partir del código de estado DSN y el cuerpo.
 	 *
-	 * Códigos 5.x.x → hard (permanente). Códigos 4.x.x → soft (transitorio).
+	 * - 'hard'   → dirección permanentemente inválida (5.1.x, 5.2.x o keywords de usuario inexistente).
+	 * - 'policy' → rechazo por reputación/spam/blacklist (5.7.x, 5.4.x, 5.3.x o keywords de bloqueo).
+	 * - 'soft'   → fallo transitorio (4.x.x) o 5.x.x no clasificado (conservador).
 	 *
 	 * @param string $body Cuerpo completo del mensaje.
-	 * @return string|null 'hard', 'soft' o null si no se puede clasificar.
+	 * @return string|null 'hard', 'soft', 'policy' o null si no se puede clasificar.
 	 */
 	private function classify_bounce( string $body ): ?string {
+		$body_lower = strtolower( $body );
+
 		// Status DSN (RFC 3464): "Status: 5.1.1" o "Status: 4.2.2".
-		if ( preg_match( '/Status:\s*([45])\.\d+\.\d+/i', $body, $m ) ) {
-			return ( '5' === $m[1] ) ? 'hard' : 'soft';
+		if ( preg_match( '/Status:\s*([45])\.(\d+)\.\d+/i', $body, $m ) ) {
+			$class    = (int) $m[1];
+			$subclass = (int) $m[2];
+
+			if ( 4 === $class ) {
+				return 'soft';
+			}
+
+			// 5.x.x: clasificar por subcategoría.
+			if ( in_array( $subclass, self::HARD_DSN_SUBCATEGORIES, true ) ) {
+				return 'hard';
+			}
+			if ( in_array( $subclass, self::POLICY_DSN_SUBCATEGORIES, true ) ) {
+				return 'policy';
+			}
+
+			// 5.x.x desconocido: comprobar keywords antes de asumir soft.
+			foreach ( self::POLICY_KEYWORDS as $kw ) {
+				if ( str_contains( $body_lower, $kw ) ) {
+					return 'policy';
+				}
+			}
+
+			return 'soft';
 		}
 
-		// Diagnostic-Code con código SMTP.
-		if ( preg_match( '/Diagnostic-Code:.*\b([45]\d\d)\b/i', $body, $m ) ) {
-			return ( '5' === $m[1][0] ) ? 'hard' : 'soft';
+		// Diagnostic-Code con código SMTP (ej: "550 5.7.1 ...").
+		if ( preg_match( '/Diagnostic-Code:.*\b([45])(\d)\d\b/i', $body, $m ) ) {
+			if ( '4' === $m[1] ) {
+				return 'soft';
+			}
+			// 5xx: segundo dígito mapea a subcategoría DSN aproximada.
+			$second_digit = (int) $m[2];
+			if ( in_array( $second_digit, self::HARD_DSN_SUBCATEGORIES, true ) ) {
+				return 'hard';
+			}
+			if ( in_array( $second_digit, self::POLICY_DSN_SUBCATEGORIES, true ) ) {
+				return 'policy';
+			}
 		}
 
-		// Palabras clave para hard bounce.
+		// Palabras clave de dirección inexistente → hard.
 		$hard_keywords = array(
 			'user unknown',
 			'no such user',
 			'does not exist',
 			'invalid address',
-			'address rejected',
 			'domain not found',
 		);
-		$body_lower    = strtolower( $body );
 		foreach ( $hard_keywords as $kw ) {
 			if ( str_contains( $body_lower, $kw ) ) {
 				return 'hard';
 			}
 		}
 
-		// Por defecto tratamos como soft si parece bounce pero no clasificamos.
+		// Palabras clave de bloqueo → policy.
+		foreach ( self::POLICY_KEYWORDS as $kw ) {
+			if ( str_contains( $body_lower, $kw ) ) {
+				return 'policy';
+			}
+		}
+
+		// Por defecto: soft (conservador, no destruir suscriptores por falsos positivos).
 		return 'soft';
 	}
 

@@ -23,8 +23,9 @@ class MBH_Notifier {
 		$hard_count      = count( $results['hard'] ?? array() );
 		$soft_count      = count( $results['soft'] ?? array() );
 		$threshold_count = count( $results['soft_threshold_reached'] ?? array() );
+		$policy_count    = count( $results['policy'] ?? array() );
 
-		if ( 0 === $hard_count && 0 === $soft_count ) {
+		if ( 0 === $hard_count && 0 === $soft_count && 0 === $policy_count ) {
 			return;
 		}
 
@@ -34,13 +35,14 @@ class MBH_Notifier {
 		}
 
 		$subject = sprintf(
-			// translators: %1$d hard bounces, %2$d soft bounces.
-			__( '[MailPoet Bounce Handler] %1$d hard bounces, %2$d soft bounces procesados', 'mailpoet-bounce-handler' ),
+			// translators: %1$d hard bounces, %2$d soft bounces, %3$d policy bounces.
+			__( '[MailPoet Bounce Handler] %1$d hard, %2$d soft, %3$d policy bounces procesados', 'mailpoet-bounce-handler' ),
 			$hard_count,
-			$soft_count
+			$soft_count,
+			$policy_count
 		);
 
-		$body = $this->build_email_body( $results, $hard_count, $soft_count, $threshold_count );
+		$body = $this->build_email_body( $results, $hard_count, $soft_count, $threshold_count, $policy_count );
 
 		wp_mail( $to, $subject, $body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 	}
@@ -52,9 +54,10 @@ class MBH_Notifier {
 	 * @param int   $hard_count      Número de hard bounces.
 	 * @param int   $soft_count      Número de soft bounces.
 	 * @param int   $threshold_count Soft bounces que alcanzaron el umbral.
+	 * @param int   $policy_count    Número de policy bounces.
 	 * @return string HTML del cuerpo.
 	 */
-	private function build_email_body( array $results, int $hard_count, int $soft_count, int $threshold_count ): string {
+	private function build_email_body( array $results, int $hard_count, int $soft_count, int $threshold_count, int $policy_count = 0 ): string {
 		$site_name = get_bloginfo( 'name' );
 		$date      = wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) );
 
@@ -92,6 +95,14 @@ class MBH_Notifier {
 				?>
 			</li>
 			<?php endif; ?>
+			<?php if ( $policy_count > 0 ) : ?>
+			<li style="color:#b32d2e;font-weight:bold">
+				<?php
+				/* translators: %d: número de policy bounces detectados */
+				echo esc_html( sprintf( __( '⚠ Policy/blacklist bounces (servidor bloqueado): %d — suscriptores NO marcados', 'mailpoet-bounce-handler' ), $policy_count ) );
+				?>
+			</li>
+			<?php endif; ?>
 		</ul>
 
 		<?php if ( ! empty( $results['hard'] ) ) : ?>
@@ -116,6 +127,16 @@ class MBH_Notifier {
 		<h3><?php esc_html_e( 'Soft bounces (pendientes de umbral)', 'mailpoet-bounce-handler' ); ?></h3>
 		<ul>
 			<?php foreach ( $results['soft'] as $bounce ) : ?>
+			<li><?php echo esc_html( $bounce['email'] ); ?></li>
+			<?php endforeach; ?>
+		</ul>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $results['policy'] ) ) : ?>
+		<h3 style="color:#b32d2e"><?php esc_html_e( '⚠ Policy/blacklist bounces — revisar reputación del servidor', 'mailpoet-bounce-handler' ); ?></h3>
+		<p><?php esc_html_e( 'Estos emails fueron rechazados por política o reputación. Los suscriptores NO han sido marcados como bounced. Comprueba si tu servidor de envío está en alguna blacklist.', 'mailpoet-bounce-handler' ); ?></p>
+		<ul>
+			<?php foreach ( $results['policy'] as $bounce ) : ?>
 			<li><?php echo esc_html( $bounce['email'] ); ?></li>
 			<?php endforeach; ?>
 		</ul>
