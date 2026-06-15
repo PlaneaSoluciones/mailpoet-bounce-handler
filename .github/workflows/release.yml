@@ -14,10 +14,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Build plugin ZIP
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          SLUG="mailpoet-bounce-handler"
+          ZIP="${SLUG}.zip"
+
+          mkdir -p "/tmp/${SLUG}"
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='vendor' \
+            --exclude='scripts' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='.phpcs.xml.dist' \
+            --exclude='.editorconfig' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='CLAUDE.md' \
+            . "/tmp/${SLUG}/"
+
+          cd /tmp
+          zip -r "${ZIP}" "${SLUG}/"
+          echo "ZIP_PATH=/tmp/${ZIP}" >> "$GITHUB_ENV"
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "${{ github.ref_name }}" \
-            --generate-notes
+            --generate-notes \
+            "$ZIP_PATH"

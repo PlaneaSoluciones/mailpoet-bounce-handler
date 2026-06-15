@@ -121,10 +121,10 @@ class MBH_Admin {
 			'mbh-admin',
 			'mbhAdmin',
 			array(
-				'ajaxUrl'           => admin_url( 'admin-ajax.php' ),
-				'nonce'             => wp_create_nonce( 'mbh_admin_nonce' ),
-				'testingLabel'      => __( 'Probando...', 'mailpoet-bounce-handler' ),
-				'processingLabel'   => __( 'Procesando...', 'mailpoet-bounce-handler' ),
+				'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
+				'nonce'           => wp_create_nonce( 'mbh_admin_nonce' ),
+				'testingLabel'    => __( 'Probando...', 'mailpoet-bounce-handler' ),
+				'processingLabel' => __( 'Procesando...', 'mailpoet-bounce-handler' ),
 			)
 		);
 	}
@@ -250,28 +250,34 @@ class MBH_Admin {
 		$out = fopen( 'php://output', 'w' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fopen
 		fprintf( $out, chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) ); // BOM UTF-8.
 
-		fputcsv( $out, array(
-			__( 'Fecha', 'mailpoet-bounce-handler' ),
-			__( 'Email', 'mailpoet-bounce-handler' ),
-			__( 'Tipo', 'mailpoet-bounce-handler' ),
-			__( 'Intentos soft', 'mailpoet-bounce-handler' ),
-			__( 'Acción', 'mailpoet-bounce-handler' ),
-			__( 'Estado anterior', 'mailpoet-bounce-handler' ),
-			__( 'Estado posterior', 'mailpoet-bounce-handler' ),
-			__( 'Asunto', 'mailpoet-bounce-handler' ),
-		) );
+		fputcsv(
+			$out,
+			array(
+				__( 'Fecha', 'mailpoet-bounce-handler' ),
+				__( 'Email', 'mailpoet-bounce-handler' ),
+				__( 'Tipo', 'mailpoet-bounce-handler' ),
+				__( 'Intentos soft', 'mailpoet-bounce-handler' ),
+				__( 'Acción', 'mailpoet-bounce-handler' ),
+				__( 'Estado anterior', 'mailpoet-bounce-handler' ),
+				__( 'Estado posterior', 'mailpoet-bounce-handler' ),
+				__( 'Asunto', 'mailpoet-bounce-handler' ),
+			)
+		);
 
 		foreach ( $data['items'] as $row ) {
-			fputcsv( $out, array(
-				$row->processed_at,
-				$row->email,
-				$row->bounce_type,
-				$row->soft_count,
-				$row->action_taken,
-				$row->status_before,
-				$row->status_after,
-				$row->raw_subject,
-			) );
+			fputcsv(
+				$out,
+				array(
+					$row->processed_at,
+					$row->email,
+					$row->bounce_type,
+					$row->soft_count,
+					$row->action_taken,
+					$row->status_before,
+					$row->status_after,
+					$row->raw_subject,
+				)
+			);
 		}
 
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_fclose

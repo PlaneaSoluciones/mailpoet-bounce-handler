@@ -17,15 +17,11 @@ class MBH_Notifier {
 	/**
 	 * Envía un email con el resumen del procesado si hubo bounces.
 	 *
-	 * @param array{
-	 *   hard: array<int, array{email: string}>,
-	 *   soft: array<int, array{email: string}>,
-	 *   soft_threshold_reached: array<int, array{email: string}>
-	 * } $results Resultados del procesado.
+	 * @param array $results Resultados del procesado: hard, soft, soft_threshold_reached.
 	 */
 	public function send_summary( array $results ): void {
-		$hard_count     = count( $results['hard'] ?? array() );
-		$soft_count     = count( $results['soft'] ?? array() );
+		$hard_count      = count( $results['hard'] ?? array() );
+		$soft_count      = count( $results['soft'] ?? array() );
 		$threshold_count = count( $results['soft_threshold_reached'] ?? array() );
 
 		if ( 0 === $hard_count && 0 === $soft_count ) {
@@ -66,15 +62,35 @@ class MBH_Notifier {
 		?>
 		<html>
 		<body style="font-family: sans-serif; color: #333;">
-		<h2><?php echo esc_html( sprintf( __( 'Bounce Handler — %s', 'mailpoet-bounce-handler' ), $site_name ) ); ?></h2>
+		<h2>
+		<?php
+		/* translators: %s: nombre del sitio web */
+		echo esc_html( sprintf( __( 'Bounce Handler — %s', 'mailpoet-bounce-handler' ), $site_name ) );
+		?>
+		</h2>
 		<p><?php echo esc_html( $date ); ?></p>
 
 		<h3><?php esc_html_e( 'Resumen', 'mailpoet-bounce-handler' ); ?></h3>
 		<ul>
-			<li><?php echo esc_html( sprintf( __( 'Hard bounces: %d', 'mailpoet-bounce-handler' ), $hard_count ) ); ?></li>
-			<li><?php echo esc_html( sprintf( __( 'Soft bounces: %d', 'mailpoet-bounce-handler' ), $soft_count ) ); ?></li>
+			<li>
+			<?php
+			/* translators: %d: número de hard bounces */
+			echo esc_html( sprintf( __( 'Hard bounces: %d', 'mailpoet-bounce-handler' ), $hard_count ) );
+			?>
+			</li>
+			<li>
+			<?php
+			/* translators: %d: número de soft bounces */
+			echo esc_html( sprintf( __( 'Soft bounces: %d', 'mailpoet-bounce-handler' ), $soft_count ) );
+			?>
+			</li>
 			<?php if ( $threshold_count > 0 ) : ?>
-			<li><?php echo esc_html( sprintf( __( 'Soft → marcados como bounced (umbral alcanzado): %d', 'mailpoet-bounce-handler' ), $threshold_count ) ); ?></li>
+			<li>
+				<?php
+				/* translators: %d: número de soft bounces que alcanzaron el umbral */
+				echo esc_html( sprintf( __( 'Soft → marcados como bounced (umbral alcanzado): %d', 'mailpoet-bounce-handler' ), $threshold_count ) );
+				?>
+			</li>
 			<?php endif; ?>
 		</ul>
 

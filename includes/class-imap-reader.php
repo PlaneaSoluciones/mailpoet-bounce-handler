@@ -29,6 +29,8 @@ class MBH_IMAP_Reader {
 	private array $config;
 
 	/**
+	 * Inicializa el lector con la configuración de conexión.
+	 *
 	 * @param array $config Claves: host, port, ssl, protocol, user, pass.
 	 */
 	public function __construct( array $config ) {
@@ -44,12 +46,12 @@ class MBH_IMAP_Reader {
 	public function connect(): bool {
 		if ( ! extension_loaded( 'imap' ) ) {
 			throw new RuntimeException(
-				__( 'La extensión PHP imap no está disponible.', 'mailpoet-bounce-handler' )
+				__( 'La extensión PHP imap no está disponible.', 'mailpoet-bounce-handler' ) // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
 			);
 		}
 
-		$flags    = $this->build_flags();
-		$mailbox  = '{' . $this->config['host'] . ':' . $this->config['port'] . $flags . '}INBOX';
+		$flags   = $this->build_flags();
+		$mailbox = '{' . $this->config['host'] . ':' . $this->config['port'] . $flags . '}INBOX';
 
 		// imap_open puede generar warnings — los suprimimos y comprobamos el retorno.
 		$this->stream = @imap_open( // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged

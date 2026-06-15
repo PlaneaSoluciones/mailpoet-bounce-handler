@@ -128,10 +128,14 @@ class MBH_Bounce_Parser {
 
 		// Palabras clave para hard bounce.
 		$hard_keywords = array(
-			'user unknown', 'no such user', 'does not exist',
-			'invalid address', 'address rejected', 'domain not found',
+			'user unknown',
+			'no such user',
+			'does not exist',
+			'invalid address',
+			'address rejected',
+			'domain not found',
 		);
-		$body_lower = strtolower( $body );
+		$body_lower    = strtolower( $body );
 		foreach ( $hard_keywords as $kw ) {
 			if ( str_contains( $body_lower, $kw ) ) {
 				return 'hard';

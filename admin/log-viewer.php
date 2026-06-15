@@ -9,19 +9,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$logger  = new MBH_Logger();
-$page    = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$filters = array(
+$logger   = new MBH_Logger();
+$mbh_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$filters  = array(
 	'bounce_type' => isset( $_GET['bounce_type'] ) ? sanitize_text_field( wp_unslash( $_GET['bounce_type'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	'date_from'   => isset( $_GET['date_from'] ) ? sanitize_text_field( wp_unslash( $_GET['date_from'] ) ) : '',     // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	'date_to'     => isset( $_GET['date_to'] ) ? sanitize_text_field( wp_unslash( $_GET['date_to'] ) ) : '',         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 );
 
-$per_page = 25;
-$data     = $logger->get_logs( $filters, $page, $per_page );
-$items    = $data['items'];
-$total    = $data['total'];
-$pages    = (int) ceil( $total / $per_page );
+$mbh_per_page = 25;
+$data         = $logger->get_logs( $filters, $mbh_page, $mbh_per_page );
+$items        = $data['items'];
+$total        = $data['total'];
+$mbh_pages    = (int) ceil( $total / $mbh_per_page );
 
 $base_url     = admin_url( 'admin.php?page=mbh-log' );
 $export_nonce = wp_create_nonce( 'mbh_export_csv' );
@@ -63,7 +63,12 @@ $export_url   = add_query_arg(
 		</a>
 	</form>
 
-	<p><?php echo esc_html( sprintf( _n( '%d entrada', '%d entradas', $total, 'mailpoet-bounce-handler' ), $total ) ); ?></p>
+	<p>
+	<?php
+	/* translators: %d: número de entradas en el log */
+	echo esc_html( sprintf( _n( '%d entrada', '%d entradas', $total, 'mailpoet-bounce-handler' ), $total ) );
+	?>
+	</p>
 
 	<?php if ( empty( $items ) ) : ?>
 	<p><?php esc_html_e( 'No hay registros para los filtros seleccionados.', 'mailpoet-bounce-handler' ); ?></p>
@@ -100,21 +105,23 @@ $export_url   = add_query_arg(
 	</table>
 
 	<!-- Paginación -->
-	<?php if ( $pages > 1 ) : ?>
+		<?php if ( $mbh_pages > 1 ) : ?>
 	<div class="tablenav bottom">
 		<div class="tablenav-pages">
 			<?php
 			$pagination_args = array_merge( $filters, array( 'page' => 'mbh-log' ) );
 			echo wp_kses_post(
-				paginate_links( array(
-					'base'      => add_query_arg( 'paged', '%#%', admin_url( 'admin.php' ) ),
-					'format'    => '',
-					'add_args'  => $pagination_args,
-					'current'   => $page,
-					'total'     => $pages,
-					'prev_text' => '&laquo;',
-					'next_text' => '&raquo;',
-				) )
+				paginate_links(
+					array(
+						'base'      => add_query_arg( 'paged', '%#%', admin_url( 'admin.php' ) ),
+						'format'    => '',
+						'add_args'  => $pagination_args,
+						'current'   => $mbh_page,
+						'total'     => $mbh_pages,
+						'prev_text' => '&laquo;',
+						'next_text' => '&raquo;',
+					)
+				)
 			);
 			?>
 		</div>

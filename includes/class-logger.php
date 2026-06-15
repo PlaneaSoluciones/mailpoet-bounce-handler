@@ -17,15 +17,7 @@ class MBH_Logger {
 	/**
 	 * Registra una entrada de bounce procesado.
 	 *
-	 * @param array{
-	 *   email: string,
-	 *   bounce_type: string,
-	 *   soft_count: int,
-	 *   action_taken: string,
-	 *   status_before: string,
-	 *   status_after: string,
-	 *   raw_subject: string
-	 * } $data Datos del bounce.
+	 * @param array $data Datos del bounce: email, bounce_type, soft_count, action_taken, status_before, status_after, raw_subject.
 	 * @return int|false ID insertado o false en caso de error.
 	 */
 	public function log_bounce( array $data ) {
@@ -133,9 +125,9 @@ class MBH_Logger {
 	/**
 	 * Retorna entradas del log con filtros opcionales.
 	 *
-	 * @param array  $filters  Filtros: 'bounce_type', 'date_from', 'date_to'.
-	 * @param int    $page     Página actual (1-based).
-	 * @param int    $per_page Resultados por página.
+	 * @param array $filters  Filtros: 'bounce_type', 'date_from', 'date_to'.
+	 * @param int   $page     Página actual (1-based).
+	 * @param int   $per_page Resultados por página.
 	 * @return array{items: array, total: int}
 	 */
 	public function get_logs( array $filters = array(), int $page = 1, int $per_page = 25 ): array {
@@ -170,7 +162,7 @@ class MBH_Logger {
 			$total = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM `{$table}` WHERE {$where_sql}", $params ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 			$items = $wpdb->get_results(
-				$wpdb->prepare( $base_query . ' LIMIT %d OFFSET %d', array_merge( $params, array( $per_page, $offset ) ) )
+				$wpdb->prepare( $base_query . ' LIMIT %d OFFSET %d', array_merge( $params, array( $per_page, $offset ) ) ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			);
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
@@ -182,7 +174,7 @@ class MBH_Logger {
 		}
 
 		return array(
-			'items' => $items ?: array(),
+			'items' => ! empty( $items ) ? $items : array(),
 			'total' => $total,
 		);
 	}

@@ -206,23 +206,25 @@ function mbh_run_bounce_processing(): array {
 			continue;
 		}
 
-		$email = $parsed['email'];
-		$type  = $parsed['type'];
+		$email   = $parsed['email'];
+		$type    = $parsed['type'];
 		$subject = $message['header']->subject ?? '';
 
 		if ( 'hard' === $type ) {
 			$status = $updater->mark_as_bounced( $email );
 			$logger->reset_soft_count( $email );
 
-			$logger->log_bounce( array(
-				'email'         => $email,
-				'bounce_type'   => 'hard',
-				'soft_count'    => 0,
-				'action_taken'  => 'marked_bounced',
-				'status_before' => $status['before'] ?? '',
-				'status_after'  => $status['after'] ?? '',
-				'raw_subject'   => $subject,
-			) );
+			$logger->log_bounce(
+				array(
+					'email'         => $email,
+					'bounce_type'   => 'hard',
+					'soft_count'    => 0,
+					'action_taken'  => 'marked_bounced',
+					'status_before' => $status['before'] ?? '',
+					'status_after'  => $status['after'] ?? '',
+					'raw_subject'   => $subject,
+				)
+			);
 
 			$results['hard'][] = array( 'email' => $email );
 
@@ -233,27 +235,31 @@ function mbh_run_bounce_processing(): array {
 				$status = $updater->mark_as_bounced( $email );
 				$logger->reset_soft_count( $email );
 
-				$logger->log_bounce( array(
-					'email'         => $email,
-					'bounce_type'   => 'soft',
-					'soft_count'    => $soft_count,
-					'action_taken'  => 'marked_bounced_threshold',
-					'status_before' => $status['before'] ?? '',
-					'status_after'  => $status['after'] ?? '',
-					'raw_subject'   => $subject,
-				) );
+				$logger->log_bounce(
+					array(
+						'email'         => $email,
+						'bounce_type'   => 'soft',
+						'soft_count'    => $soft_count,
+						'action_taken'  => 'marked_bounced_threshold',
+						'status_before' => $status['before'] ?? '',
+						'status_after'  => $status['after'] ?? '',
+						'raw_subject'   => $subject,
+					)
+				);
 
 				$results['soft_threshold_reached'][] = array( 'email' => $email );
 			} else {
-				$logger->log_bounce( array(
-					'email'         => $email,
-					'bounce_type'   => 'soft',
-					'soft_count'    => $soft_count,
-					'action_taken'  => 'soft_count_incremented',
-					'status_before' => '',
-					'status_after'  => '',
-					'raw_subject'   => $subject,
-				) );
+				$logger->log_bounce(
+					array(
+						'email'         => $email,
+						'bounce_type'   => 'soft',
+						'soft_count'    => $soft_count,
+						'action_taken'  => 'soft_count_incremented',
+						'status_before' => '',
+						'status_after'  => '',
+						'raw_subject'   => $subject,
+					)
+				);
 
 				$results['soft'][] = array( 'email' => $email );
 			}
@@ -346,7 +352,7 @@ function mbh_decrypt_password( string $stored ): string {
 	}
 
 	list( $iv, $cipher ) = explode( '::', $decoded, 2 );
-	$key = substr( AUTH_KEY . SECURE_AUTH_KEY, 0, 32 );
+	$key                 = substr( AUTH_KEY . SECURE_AUTH_KEY, 0, 32 );
 
 	$plain = openssl_decrypt( $cipher, 'AES-256-CBC', $key, 0, $iv );
 
