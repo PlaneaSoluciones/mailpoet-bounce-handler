@@ -18,7 +18,7 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           SLUG="mailpoet-bounce-handler"
-          ZIP="${SLUG}.zip"
+          ZIP="${SLUG}-${VERSION}.zip"
 
           mkdir -p "/tmp/${SLUG}"
           rsync -a \
