@@ -1,0 +1,29 @@
+{
+    "name": "planeasoluciones/mailpoet-bounce-handler",
+    "type": "wordpress-plugin",
+    "description": "Gestión automática de bounces IMAP para MailPoet 3",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Planea Soluciones",
+            "homepage": "https://planea.com.es"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.8",
+        "wp-coding-standards/wpcs": "^3.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0"
+    },
+    "scripts": {
+        "lint": "phpcs",
+        "lint:fix": "phpcbf",
+        "post-install-cmd": ["bash scripts/setup-git-hooks.sh"],
+        "post-update-cmd": ["bash scripts/setup-git-hooks.sh"]
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

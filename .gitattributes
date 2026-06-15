@@ -1,0 +1,10 @@
+# Forzar LF en todos los archivos de texto para evitar problemas cross-platform.
+* text=auto eol=lf
+
+# Los shell scripts DEBEN tener LF o no funcionarán en Linux/macOS.
+*.sh text eol=lf
+
+# Binarios — sin conversión de línea.
+*.png binary
+*.jpg binary
+*.mo binary

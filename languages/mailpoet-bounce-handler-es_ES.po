@@ -1,0 +1,234 @@
+# Translation of MailPoet Bounce Handler in Spanish (Spain)
+# This file is distributed under the same license as the plugin.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MailPoet Bounce Handler 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/PlanaSoluciones/mailpoet-bounce-handler/issues\n"
+"POT-Creation-Date: 2026-06-15\n"
+"PO-Revision-Date: 2026-06-15\n"
+"Last-Translator: Planea Soluciones <info@planea.com.es>\n"
+"Language-Team: Spanish (Spain)\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "MailPoet Bounce Handler requiere que MailPoet 3 esté instalado y activo. Plugin no activado."
+msgstr "MailPoet Bounce Handler requiere que MailPoet 3 esté instalado y activo. Plugin no activado."
+
+msgid "Dependencia no satisfecha"
+msgstr "Dependencia no satisfecha"
+
+msgid "MailPoet Bounce Handler ha sido desactivado porque MailPoet 3 no está activo."
+msgstr "MailPoet Bounce Handler ha sido desactivado porque MailPoet 3 no está activo."
+
+msgid "MailPoet Bounce Handler: la extensión PHP imap no está disponible. El plugin no puede conectarse al buzón de correo."
+msgstr "MailPoet Bounce Handler: la extensión PHP imap no está disponible. El plugin no puede conectarse al buzón de correo."
+
+msgid "Cada 6 horas"
+msgstr "Cada 6 horas"
+
+msgid "[MailPoet Bounce Handler] %1$d hard bounces, %2$d soft bounces procesados"
+msgstr "[MailPoet Bounce Handler] %1$d hard bounces, %2$d soft bounces procesados"
+
+msgid "Bounce Handler — %s"
+msgstr "Bounce Handler — %s"
+
+msgid "Resumen"
+msgstr "Resumen"
+
+msgid "Hard bounces: %d"
+msgstr "Hard bounces: %d"
+
+msgid "Soft bounces: %d"
+msgstr "Soft bounces: %d"
+
+msgid "Soft → marcados como bounced (umbral alcanzado): %d"
+msgstr "Soft → marcados como bounced (umbral alcanzado): %d"
+
+msgid "Hard bounces"
+msgstr "Hard bounces"
+
+msgid "Soft bounces — umbral alcanzado (marcados como bounced)"
+msgstr "Soft bounces — umbral alcanzado (marcados como bounced)"
+
+msgid "Soft bounces (pendientes de umbral)"
+msgstr "Soft bounces (pendientes de umbral)"
+
+msgid "MailPoet Bounce Handler — Planea Soluciones"
+msgstr "MailPoet Bounce Handler — Planea Soluciones"
+
+msgid "Sin permisos."
+msgstr "Sin permisos."
+
+msgid "Probando..."
+msgstr "Probando..."
+
+msgid "Procesando..."
+msgstr "Procesando..."
+
+msgid "Conexión establecida correctamente."
+msgstr "Conexión establecida correctamente."
+
+msgid "No se pudo conectar. Verifica los datos."
+msgstr "No se pudo conectar. Verifica los datos."
+
+msgid "Nonce inválido."
+msgstr "Nonce inválido."
+
+msgid "Procesado: %1$d hard, %2$d soft (pendientes), %3$d soft → bounced (umbral)."
+msgstr "Procesado: %1$d hard, %2$d soft (pendientes), %3$d soft → bounced (umbral)."
+
+msgid "Bounce Handler — Ajustes"
+msgstr "Bounce Handler — Ajustes"
+
+msgid "La extensión PHP imap no está disponible. El plugin no puede conectarse al buzón hasta que se habilite."
+msgstr "La extensión PHP imap no está disponible. El plugin no puede conectarse al buzón hasta que se habilite."
+
+msgid "La conexión IMAP no está configurada. El procesado automático no funcionará hasta completar los ajustes."
+msgstr "La conexión IMAP no está configurada. El procesado automático no funcionará hasta completar los ajustes."
+
+msgid "Conexión IMAP / POP3"
+msgstr "Conexión IMAP / POP3"
+
+msgid "Servidor"
+msgstr "Servidor"
+
+msgid "Puerto"
+msgstr "Puerto"
+
+msgid "IMAP con SSL: 993. POP3 con SSL: 995. Sin SSL: 143 / 110."
+msgstr "IMAP con SSL: 993. POP3 con SSL: 995. Sin SSL: 143 / 110."
+
+msgid "Protocolo"
+msgstr "Protocolo"
+
+msgid "Conexión segura (SSL)"
+msgstr "Conexión segura (SSL)"
+
+msgid "Usar SSL/TLS"
+msgstr "Usar SSL/TLS"
+
+msgid "Usuario"
+msgstr "Usuario"
+
+msgid "Contraseña"
+msgstr "Contraseña"
+
+msgid "Dejar vacío para no cambiarla"
+msgstr "Dejar vacío para no cambiarla"
+
+msgid "Probar conexión"
+msgstr "Probar conexión"
+
+msgid "Reglas"
+msgstr "Reglas"
+
+msgid "Umbral soft bounce"
+msgstr "Umbral soft bounce"
+
+msgid "Número de soft bounces antes de marcar el suscriptor como bounced."
+msgstr "Número de soft bounces antes de marcar el suscriptor como bounced."
+
+msgid "Programación"
+msgstr "Programación"
+
+msgid "Frecuencia de procesado"
+msgstr "Frecuencia de procesado"
+
+msgid "Cada hora"
+msgstr "Cada hora"
+
+msgid "Cada 6 horas"
+msgstr "Cada 6 horas"
+
+msgid "Diariamente"
+msgstr "Diariamente"
+
+msgid "Notificaciones"
+msgstr "Notificaciones"
+
+msgid "Email de notificación"
+msgstr "Email de notificación"
+
+msgid "Recibirá el resumen al finalizar cada procesado con bounces. Hereda el reply-to de MailPoet si se deja vacío."
+msgstr "Recibirá el resumen al finalizar cada procesado con bounces. Hereda el reply-to de MailPoet si se deja vacío."
+
+msgid "Mantenimiento"
+msgstr "Mantenimiento"
+
+msgid "Retención del log (días)"
+msgstr "Retención del log (días)"
+
+msgid "Acciones manuales"
+msgstr "Acciones manuales"
+
+msgid "Procesar ahora"
+msgstr "Procesar ahora"
+
+msgid "Bounce Handler"
+msgstr "Bounce Handler"
+
+msgid "Bounce Handler — Log"
+msgstr "Bounce Handler — Log"
+
+msgid "Bounce Log"
+msgstr "Bounce Log"
+
+msgid "Bounce Handler — Log"
+msgstr "Bounce Handler — Log"
+
+msgid "Tipo:"
+msgstr "Tipo:"
+
+msgid "Todos"
+msgstr "Todos"
+
+msgid "Desde:"
+msgstr "Desde:"
+
+msgid "Hasta:"
+msgstr "Hasta:"
+
+msgid "Filtrar"
+msgstr "Filtrar"
+
+msgid "Limpiar"
+msgstr "Limpiar"
+
+msgid "Exportar CSV"
+msgstr "Exportar CSV"
+
+msgid "%d entrada"
+msgid_plural "%d entradas"
+msgstr[0] "%d entrada"
+msgstr[1] "%d entradas"
+
+msgid "No hay registros para los filtros seleccionados."
+msgstr "No hay registros para los filtros seleccionados."
+
+msgid "Fecha"
+msgstr "Fecha"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Tipo"
+msgstr "Tipo"
+
+msgid "Intentos soft"
+msgstr "Intentos soft"
+
+msgid "Acción"
+msgstr "Acción"
+
+msgid "Estado anterior"
+msgstr "Estado anterior"
+
+msgid "Estado posterior"
+msgstr "Estado posterior"
+
+msgid "La extensión PHP imap no está disponible."
+msgstr "La extensión PHP imap no está disponible."

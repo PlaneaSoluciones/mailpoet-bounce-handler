@@ -1,0 +1,19 @@
+# Dependencias de desarrollo (no se despliegan)
+vendor/
+
+# Archivos generados de idioma
+languages/*.pot
+languages/*.mo
+
+# IDEs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer lock (lock solo en aplicaciones, no en librerías/plugins)
+composer.lock
