@@ -50,7 +50,9 @@ languages/
 
 ## Releases
 
-Antes de taggear: añadir una sección `## [X.Y.Z] - AAAA-MM-DD` en `CHANGELOG.md` (formato Keep a Changelog) con los cambios de esa versión. El workflow extrae esa sección y la usa como notas del release — si no encuentra la sección para la versión taggeada, falla el build.
+`CHANGELOG.md` se mantiene actualizado de forma continua, no solo al taggear: cada commit `feat:`/`fix:` añade su entrada en `## [Unreleased]` en el momento del cambio (formato Keep a Changelog).
+
+Antes de taggear: mover el contenido de `[Unreleased]` a una nueva sección `## [X.Y.Z] - AAAA-MM-DD`. El workflow extrae esa sección con `awk` y la usa como notas del release — si no encuentra la sección para la versión taggeada, falla el build.
 
 ```bash
 git tag vX.Y.Z
