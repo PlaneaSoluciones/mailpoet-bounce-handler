@@ -3,7 +3,7 @@
  * Plugin Name: MailPoet Bounce Handler
  * Plugin URI:  https://github.com/PlanaSoluciones/mailpoet-bounce-handler
  * Description: Gestión automática de bounces IMAP/POP3 para MailPoet 3. Requiere MailPoet 3 instalado y activo.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      Planea Soluciones
  * Author URI:  https://planea.com.es
  * License:     GPL-2.0-or-later
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MBH_VERSION', '1.0.0' );
+define( 'MBH_VERSION', '1.1.0' );
 define( 'MBH_PLUGIN_FILE', __FILE__ );
 define( 'MBH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
