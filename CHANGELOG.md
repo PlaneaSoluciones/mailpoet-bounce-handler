@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-06-16
+
 ### Cambiado
 
 - Las páginas "Bounce Handler" y "Bounce Log" ya no viven bajo Herramientas; ahora aparecen como submenú dentro del menú de MailPoet.
@@ -35,7 +37,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 - Corregidas violaciones de estilo PHPCS/WPCS y ajustada la configuración del linter.
 - El ZIP del release ahora incluye el número de versión en el nombre del archivo, manteniendo la carpeta interna con el slug del plugin para que WordPress sustituya la instalación anterior.
 
-[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/releases/tag/v1.1.0
