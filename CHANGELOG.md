@@ -7,6 +7,10 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Corregido
+
+- Las páginas del plugin (submenú de MailPoet) aparecían en cualquier orden y daban 404 al pulsarlas en algunos sitios. Causa: nuestro hook `admin_menu` podía ejecutarse antes que el de MailPoet, registrando nuestra página como primer hijo y haciendo que WordPress la usara como "padre real" de todo el menú de MailPoet (ver `wp-admin/includes/menu.php`). Ahora se registra con prioridad 20 para garantizar que MailPoet registre primero su página "Home".
+
 ## [1.1.3] - 2026-06-16
 
 ### Cambiado

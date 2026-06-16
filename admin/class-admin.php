@@ -35,7 +35,11 @@ class MBH_Admin {
 	 * Registra todos los hooks de WordPress para el área admin.
 	 */
 	public function init(): void {
-		add_action( 'admin_menu', array( $this, 'add_menu_pages' ) );
+		// Prioridad 20: debe ejecutarse después de que MailPoet registre su propia
+		// página "Home" (mismo slug que el padre). Si nuestras páginas se registran
+		// antes, WordPress usa la primera como "padre real" del menú de MailPoet
+		// completo (ver wp-admin/includes/menu.php), rompiendo sus URLs.
+		add_action( 'admin_menu', array( $this, 'add_menu_pages' ), 20 );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'wp_ajax_mbh_test_connection', array( $this, 'ajax_test_connection' ) );
 		add_action( 'wp_ajax_mbh_process_now', array( $this, 'ajax_process_now' ) );
