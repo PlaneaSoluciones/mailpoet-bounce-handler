@@ -227,7 +227,14 @@ class MBH_Admin {
 			if ( $connected ) {
 				wp_send_json_success( __( 'Conexión establecida correctamente.', 'mailpoet-bounce-handler' ) );
 			} else {
-				wp_send_json_error( __( 'No se pudo conectar. Verifica los datos.', 'mailpoet-bounce-handler' ) );
+				$last_error = $reader->get_last_error();
+				$message    = __( 'No se pudo conectar. Verifica los datos.', 'mailpoet-bounce-handler' );
+
+				if ( '' !== $last_error ) {
+					$message .= ' (' . $last_error . ')';
+				}
+
+				wp_send_json_error( $message );
 			}
 		} catch ( RuntimeException $e ) {
 			wp_send_json_error( $e->getMessage() );

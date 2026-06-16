@@ -17,3 +17,6 @@ Thumbs.db
 
 # Composer lock (lock solo en aplicaciones, no en librerías/plugins)
 composer.lock
+
+# Credenciales locales de prueba
+.env

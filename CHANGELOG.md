@@ -7,6 +7,10 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Corregido
+
+- "Probar conexión" fallaba con "No se pudo conectar" aunque host, usuario y contraseña fueran correctos. Causa: con SSL activado, `imap_open()` no incluía el flag `/novalidate-cert`, y la librería c-client (no soporta SNI) puede recibir un certificado distinto al esperado en hosting compartido, rechazando la conexión aunque el certificado real sea válido. Ahora siempre se añade `/novalidate-cert`. Además, el mensaje de error ahora incluye el detalle reportado por `imap_last_error()` para facilitar el diagnóstico de futuros fallos de conexión.
+
 ## [1.1.4] - 2026-06-16
 
 ### Corregido

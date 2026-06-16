@@ -68,6 +68,15 @@ class MBH_IMAP_Reader {
 	}
 
 	/**
+	 * Devuelve el último error reportado por la librería IMAP (c-client).
+	 *
+	 * @return string
+	 */
+	public function get_last_error(): string {
+		return (string) imap_last_error();
+	}
+
+	/**
 	 * Retorna todos los mensajes del buzón como array de objetos stdClass.
 	 * Cada objeto tiene: num (int), header (object), body (string).
 	 *
@@ -123,7 +132,7 @@ class MBH_IMAP_Reader {
 	 */
 	private function build_flags(): string {
 		$protocol = ( 'pop3' === $this->config['protocol'] ) ? '/pop3' : '/imap';
-		$ssl      = $this->config['ssl'] ? '/ssl' : '/novalidate-cert';
+		$ssl      = $this->config['ssl'] ? '/ssl/novalidate-cert' : '/novalidate-cert';
 		return $protocol . $ssl;
 	}
 }
