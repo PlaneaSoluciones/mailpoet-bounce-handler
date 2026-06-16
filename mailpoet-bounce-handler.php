@@ -5,7 +5,7 @@
  * Description: Gestión automática de bounces IMAP/POP3 para MailPoet 3. Requiere MailPoet 3 instalado y activo.
  * Version:     1.1.5
  * Author:      Planea Soluciones
- * Author URI:  https://planea.com.es
+ * Author URI:  https://planeasoluciones.com
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: mailpoet-bounce-handler

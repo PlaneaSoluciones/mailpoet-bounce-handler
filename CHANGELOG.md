@@ -7,6 +7,10 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Corregido
+
+- URL del autor (`Author URI` y `homepage` en `composer.json`) apuntaba a `planea.com.es` (dominio de infraestructura interna); ahora apunta a la web comercial https://planeasoluciones.com.
+
 ### Añadido
 
 - Cabecera `Requires Plugins: mailpoet` para activar la funcionalidad nativa de WordPress 6.5+ "Plugin Dependencies": en el listado de plugins, WordPress avisa automáticamente si se intenta activar este plugin sin MailPoet activo, y bloquea la desactivación/borrado de MailPoet mientras este plugin esté activo (el mismo aviso que muestran plugins como las extensiones de WooCommerce). La comprobación manual existente se mantiene como red de seguridad para WordPress < 6.5 y desactivaciones fuera de la UI de wp-admin.
