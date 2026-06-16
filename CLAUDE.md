@@ -28,7 +28,7 @@ includes/
   class-notifier.php          wp_mail() con resumen de procesado
   class-logger.php            CRUD tablas {prefix}_mbh_log y {prefix}_mbh_soft_counts
 admin/
-  class-admin.php             Menú Herramientas > Bounce Handler, AJAX handlers
+  class-admin.php             Submenú dentro del menú de MailPoet, AJAX handlers
   settings-page.php           Vista ajustes (IMAP, reglas, cron, notificaciones)
   log-viewer.php              WP_List_Table con filtros, paginación y export CSV
 languages/

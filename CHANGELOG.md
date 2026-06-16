@@ -7,6 +7,10 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Cambiado
+
+- Las páginas "Bounce Handler" y "Bounce Log" ya no viven bajo Herramientas; ahora aparecen como submenú dentro del menú de MailPoet.
+
 ## [1.1.2] - 2026-06-16
 
 ### Corregido

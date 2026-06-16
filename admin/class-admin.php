@@ -14,6 +14,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class MBH_Admin {
 
+	/** Slug del menú principal de MailPoet (Menu::MAIN_PAGE_SLUG, no es API pública). */
+	private const MAILPOET_MENU_SLUG = 'mailpoet-homepage';
+
+	/**
+	 * Hook suffix de la página de ajustes, devuelto por add_submenu_page().
+	 *
+	 * @var string
+	 */
+	private string $settings_hook = '';
+
+	/**
+	 * Hook suffix de la página de log, devuelto por add_submenu_page().
+	 *
+	 * @var string
+	 */
+	private string $log_hook = '';
+
 	/**
 	 * Registra todos los hooks de WordPress para el área admin.
 	 */
@@ -35,7 +52,7 @@ class MBH_Admin {
 	public function add_action_links( array $links ): array {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'tools.php?page=mbh-settings' ) ),
+			esc_url( admin_url( 'admin.php?page=mbh-settings' ) ),
 			esc_html__( 'Ajustes', 'mailpoet-bounce-handler' )
 		);
 
@@ -45,10 +62,11 @@ class MBH_Admin {
 	}
 
 	/**
-	 * Registra las páginas de administración bajo Herramientas.
+	 * Registra las páginas de administración como submenú del menú de MailPoet.
 	 */
 	public function add_menu_pages(): void {
-		add_management_page(
+		$this->settings_hook = (string) add_submenu_page(
+			self::MAILPOET_MENU_SLUG,
 			__( 'Bounce Handler', 'mailpoet-bounce-handler' ),
 			__( 'Bounce Handler', 'mailpoet-bounce-handler' ),
 			'manage_options',
@@ -56,8 +74,8 @@ class MBH_Admin {
 			array( $this, 'render_settings_page' )
 		);
 
-		add_submenu_page(
-			'tools.php',
+		$this->log_hook = (string) add_submenu_page(
+			self::MAILPOET_MENU_SLUG,
 			__( 'Bounce Handler — Log', 'mailpoet-bounce-handler' ),
 			__( 'Bounce Log', 'mailpoet-bounce-handler' ),
 			'manage_options',
@@ -122,9 +140,7 @@ class MBH_Admin {
 	 * @param string $hook_suffix Sufijo del hook de la página actual.
 	 */
 	public function enqueue_scripts( string $hook_suffix ): void {
-		$plugin_pages = array( 'tools_page_mbh-settings', 'tools_page_mbh-log' );
-
-		if ( ! in_array( $hook_suffix, $plugin_pages, true ) ) {
+		if ( ! in_array( $hook_suffix, array( $this->settings_hook, $this->log_hook ), true ) ) {
 			return;
 		}
 
