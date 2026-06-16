@@ -50,8 +50,10 @@ languages/
 
 ## Releases
 
+Antes de taggear: añadir una sección `## [X.Y.Z] - AAAA-MM-DD` en `CHANGELOG.md` (formato Keep a Changelog) con los cambios de esa versión. El workflow extrae esa sección y la usa como notas del release — si no encuentra la sección para la versión taggeada, falla el build.
+
 ```bash
-git tag v1.0.0
+git tag vX.Y.Z
 git push && git push --tags
 ```
 
