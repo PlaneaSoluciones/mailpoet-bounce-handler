@@ -7,6 +7,11 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Corregido
+
+- Fatal error al abrir la página de Ajustes: `MBH_MailPoet_Updater::get_reply_to_email()` llamaba a un método (`getSettings()`) que no existe en la API pública `MP('v1')` de MailPoet. Ahora se lee directamente la opción `mailpoet_settings`.
+- Los `try/catch` de `MBH_MailPoet_Updater` solo capturaban `\Exception`; un `\Error` (como el de método indefinido) no se atrapaba y tumbaba toda la página. Ahora capturan `\Throwable`.
+
 ## [1.1.1] - 2026-06-16
 
 ### Corregido

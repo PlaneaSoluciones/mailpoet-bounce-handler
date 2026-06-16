@@ -23,7 +23,7 @@ class MBH_MailPoet_Updater {
 	public function get_subscriber( string $email ): ?array {
 		try {
 			return \MailPoet\API\API::MP( 'v1' )->getSubscriber( $email );
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
 			return null;
 		}
 	}
@@ -48,7 +48,7 @@ class MBH_MailPoet_Updater {
 				$subscriber['id'],
 				array( 'status' => 'bounced' )
 			);
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
 			return null;
 		}
 
@@ -62,15 +62,15 @@ class MBH_MailPoet_Updater {
 	 * Obtiene el email reply-to configurado en MailPoet.
 	 * Retorna null si no está configurado.
 	 *
+	 * La API pública MP('v1') de MailPoet no expone los ajustes generales,
+	 * así que se lee directamente la opción donde MailPoet los almacena.
+	 *
 	 * @return string|null
 	 */
 	public function get_reply_to_email(): ?string {
-		try {
-			$settings = \MailPoet\API\API::MP( 'v1' )->getSettings();
-			$email    = $settings['reply_to']['address'] ?? null;
-			return ( $email && is_email( $email ) ) ? $email : null;
-		} catch ( \Exception $e ) {
-			return null;
-		}
+		$settings = get_option( 'mailpoet_settings' );
+		$email    = $settings['reply_to']['address'] ?? null;
+
+		return ( $email && is_email( $email ) ) ? $email : null;
 	}
 }
