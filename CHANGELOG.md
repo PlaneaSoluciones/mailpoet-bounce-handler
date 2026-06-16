@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-06-16
+
 ### Corregido
 
 - Las páginas del plugin (submenú de MailPoet) aparecían en cualquier orden y daban 404 al pulsarlas en algunos sitios. Causa: nuestro hook `admin_menu` podía ejecutarse antes que el de MailPoet, registrando nuestra página como primer hijo y haciendo que WordPress la usara como "padre real" de todo el menú de MailPoet (ver `wp-admin/includes/menu.php`). Ahora se registra con prioridad 20 para garantizar que MailPoet registre primero su página "Home".
@@ -41,7 +43,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 - Corregidas violaciones de estilo PHPCS/WPCS y ajustada la configuración del linter.
 - El ZIP del release ahora incluye el número de versión en el nombre del archivo, manteniendo la carpeta interna con el slug del plugin para que WordPress sustituya la instalación anterior.
 
-[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.4...HEAD
+[1.1.4]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.0...v1.1.1
