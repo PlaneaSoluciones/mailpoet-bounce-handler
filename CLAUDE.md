@@ -42,7 +42,9 @@ languages/
 - Clases PHP: `MBH_*`
 - Text domain: `mailpoet-bounce-handler`
 
-**Dependencia MailPoet:** `is_plugin_active('mailpoet/mailpoet.php')` verificado en activation hook y en `admin_init`. Si no está activo → plugin se desactiva con `wp_die()`.
+**Dependencia MailPoet:** doble capa.
+- Cabecera nativa `Requires Plugins: mailpoet` (WordPress ≥ 6.5, feature "Plugin Dependencies"): WordPress Core muestra automáticamente en el listado de plugins el aviso "Requires"/enlace de activación deshabilitado si MailPoet no está activo, y en la fila de MailPoet el aviso "Required by"/Desactivar-Borrar deshabilitados mientras este plugin esté activo. Solo afecta a la UI de wp-admin, no a `activate_plugin()`/`deactivate_plugins()` a nivel de API.
+- Fallback manual con `is_plugin_active('mailpoet/mailpoet.php')` verificado en activation hook y en `admin_init`. Si no está activo → plugin se desactiva con `wp_die()`. Necesario para WP < 6.5 y para cubrir desactivaciones de MailPoet que no pasan por la UI (WP-CLI, multisite red).
 
 **Contraseña IMAP:** cifrada con `openssl_encrypt()` antes de guardar en BD. Nunca en texto plano.
 
