@@ -23,6 +23,25 @@ class MBH_Admin {
 		add_action( 'wp_ajax_mbh_test_connection', array( $this, 'ajax_test_connection' ) );
 		add_action( 'wp_ajax_mbh_process_now', array( $this, 'ajax_process_now' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_filter( 'plugin_action_links_' . plugin_basename( MBH_PLUGIN_FILE ), array( $this, 'add_action_links' ) );
+	}
+
+	/**
+	 * Añade el enlace "Ajustes" en la lista de plugins.
+	 *
+	 * @param string[] $links Enlaces de acción existentes.
+	 * @return string[]
+	 */
+	public function add_action_links( array $links ): array {
+		$settings_link = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( admin_url( 'tools.php?page=mbh-settings' ) ),
+			esc_html__( 'Ajustes', 'mailpoet-bounce-handler' )
+		);
+
+		array_unshift( $links, $settings_link );
+
+		return $links;
 	}
 
 	/**
