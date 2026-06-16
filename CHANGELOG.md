@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-16
+
 ### Corregido
 
 - URL del autor (`Author URI` y `homepage` en `composer.json`) apuntaba a `planea.com.es` (dominio de infraestructura interna); ahora apunta a la web comercial https://planeasoluciones.com.
