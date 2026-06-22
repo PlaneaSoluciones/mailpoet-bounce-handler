@@ -7,6 +7,15 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Añadido
+
+- El log de bounces ahora muestra el estado del suscriptor en MailPoet ("Estado anterior" / "Estado posterior") también para soft bounces parciales y bloqueos por política, no solo cuando se marca al suscriptor como bounced.
+- Nueva opción de mantenimiento: límite máximo de filas en el log (por defecto 10 000). Al superarse, se eliminan automáticamente las entradas más antiguas, evitando el crecimiento ilimitado de la tabla.
+
+### Cambiado
+
+- La purga automática del log por antigüedad está ahora desactivada por defecto (antes: 90 días). Las instalaciones existentes conservan su valor configurado. Actívala explícitamente en Ajustes → Mantenimiento si la necesitas.
+
 ## [1.2.1] - 2026-06-22
 
 ### Corregido

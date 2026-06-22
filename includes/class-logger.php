@@ -180,19 +180,38 @@ class MBH_Logger {
 	}
 
 	/**
-	 * Elimina entradas de log más antiguas que los días de retención configurados.
+	 * Elimina entradas de log según las reglas de retención configuradas.
+	 *
+	 * Aplica en orden: primero purga por antigüedad (si days > 0), después por
+	 * número máximo de filas (si max_rows > 0), borrando las más antiguas.
 	 */
 	public function purge_old_logs(): void {
 		global $wpdb;
 
-		$days  = (int) get_option( 'mbh_log_retention_days', 90 );
-		$table = $wpdb->prefix . 'mbh_log';
+		$table    = $wpdb->prefix . 'mbh_log';
+		$days     = (int) get_option( 'mbh_log_retention_days', 0 );
+		$max_rows = (int) get_option( 'mbh_log_max_rows', 10000 );
 
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$wpdb->prepare(
-				"DELETE FROM `{$table}` WHERE processed_at < DATE_SUB(NOW(), INTERVAL %d DAY)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$days
-			)
-		);
+		if ( $days > 0 ) {
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"DELETE FROM `{$table}` WHERE processed_at < DATE_SUB(NOW(), INTERVAL %d DAY)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$days
+				)
+			);
+		}
+
+		if ( $max_rows > 0 ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$total = (int) $wpdb->get_var( "SELECT COUNT(*) FROM `{$table}`" );
+			if ( $total > $max_rows ) {
+				$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+					$wpdb->prepare(
+						"DELETE FROM `{$table}` ORDER BY id ASC LIMIT %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+						$total - $max_rows
+					)
+				);
+			}
+		}
 	}
 }
