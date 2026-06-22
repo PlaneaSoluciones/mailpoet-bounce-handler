@@ -7,6 +7,14 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-06-22
+
+### Corregido
+
+- Los rebotes con código SMTP `5xx` sin subcode DSN estándar (p.ej. `550 #5.1.0 Address rejected`, `554 30 mailbox is disabled`) se clasificaban incorrectamente como `soft` y el suscriptor no se marcaba como rebotado en MailPoet. Ahora se clasifican como `hard`.
+- Los subcodes DSN en notación de puntos dentro de `Diagnostic-Code` (p.ej. `#5.1.0`) se reconocen correctamente y determinan el tipo de rebote.
+- Los buzones deshabilitados (`mailbox is disabled`, `mailbox disabled`) se clasifican como rebote `hard`.
+
 ## [1.4.0] - 2026-06-22
 
 ### Añadido
