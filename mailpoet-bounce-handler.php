@@ -254,9 +254,10 @@ function mbh_run_bounce_processing(): array {
 			continue;
 		}
 
-		$email   = $parsed['email'];
-		$type    = $parsed['type'];
-		$subject = $message['header']->subject ?? '';
+		$email           = $parsed['email'];
+		$type            = $parsed['type'];
+		$subject         = $message['header']->subject ?? '';
+		$diagnostic_code = $parsed['diagnostic_code'] ?? null;
 
 		if ( 'hard' === $type ) {
 			$status = $updater->mark_as_bounced( $email );
@@ -264,13 +265,14 @@ function mbh_run_bounce_processing(): array {
 
 			$logger->log_bounce(
 				array(
-					'email'         => $email,
-					'bounce_type'   => 'hard',
-					'soft_count'    => 0,
-					'action_taken'  => 'marked_bounced',
-					'status_before' => $status['before'] ?? '',
-					'status_after'  => $status['after'] ?? '',
-					'raw_subject'   => $subject,
+					'email'           => $email,
+					'bounce_type'     => 'hard',
+					'soft_count'      => 0,
+					'action_taken'    => 'marked_bounced',
+					'status_before'   => $status['before'] ?? '',
+					'status_after'    => $status['after'] ?? '',
+					'raw_subject'     => $subject,
+					'diagnostic_code' => $diagnostic_code,
 				)
 			);
 
@@ -285,13 +287,14 @@ function mbh_run_bounce_processing(): array {
 
 				$logger->log_bounce(
 					array(
-						'email'         => $email,
-						'bounce_type'   => 'soft',
-						'soft_count'    => $soft_count,
-						'action_taken'  => 'marked_bounced_threshold',
-						'status_before' => $status['before'] ?? '',
-						'status_after'  => $status['after'] ?? '',
-						'raw_subject'   => $subject,
+						'email'           => $email,
+						'bounce_type'     => 'soft',
+						'soft_count'      => $soft_count,
+						'action_taken'    => 'marked_bounced_threshold',
+						'status_before'   => $status['before'] ?? '',
+						'status_after'    => $status['after'] ?? '',
+						'raw_subject'     => $subject,
+						'diagnostic_code' => $diagnostic_code,
 					)
 				);
 
@@ -300,13 +303,14 @@ function mbh_run_bounce_processing(): array {
 				$current_status = $updater->get_subscriber_status( $email ) ?? '';
 				$logger->log_bounce(
 					array(
-						'email'         => $email,
-						'bounce_type'   => 'soft',
-						'soft_count'    => $soft_count,
-						'action_taken'  => 'soft_count_incremented',
-						'status_before' => $current_status,
-						'status_after'  => $current_status,
-						'raw_subject'   => $subject,
+						'email'           => $email,
+						'bounce_type'     => 'soft',
+						'soft_count'      => $soft_count,
+						'action_taken'    => 'soft_count_incremented',
+						'status_before'   => $current_status,
+						'status_after'    => $current_status,
+						'raw_subject'     => $subject,
+						'diagnostic_code' => $diagnostic_code,
 					)
 				);
 
@@ -317,13 +321,14 @@ function mbh_run_bounce_processing(): array {
 			$current_status = $updater->get_subscriber_status( $email ) ?? '';
 			$logger->log_bounce(
 				array(
-					'email'         => $email,
-					'bounce_type'   => 'soft',
-					'soft_count'    => 0,
-					'action_taken'  => 'policy_block',
-					'status_before' => $current_status,
-					'status_after'  => $current_status,
-					'raw_subject'   => $subject,
+					'email'           => $email,
+					'bounce_type'     => 'policy',
+					'soft_count'      => 0,
+					'action_taken'    => 'policy_block',
+					'status_before'   => $current_status,
+					'status_after'    => $current_status,
+					'raw_subject'     => $subject,
+					'diagnostic_code' => $diagnostic_code,
 				)
 			);
 
@@ -365,12 +370,13 @@ function mbh_create_tables(): void {
 		id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 		processed_at DATETIME NOT NULL,
 		email VARCHAR(255) NOT NULL,
-		bounce_type ENUM('hard','soft') NOT NULL,
+		bounce_type ENUM('hard','soft','policy') NOT NULL,
 		soft_count TINYINT DEFAULT 0,
 		action_taken VARCHAR(100) DEFAULT '',
 		status_before VARCHAR(50) DEFAULT '',
 		status_after VARCHAR(50) DEFAULT '',
 		raw_subject TEXT,
+		diagnostic_code TEXT DEFAULT NULL,
 		PRIMARY KEY (id),
 		KEY email (email),
 		KEY processed_at (processed_at)
@@ -387,6 +393,37 @@ function mbh_create_tables(): void {
 	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 	dbDelta( $sql_log );
 	dbDelta( $sql_soft );
+
+	update_option( 'mbh_db_version', MBH_VERSION );
+}
+
+// ─── Actualización de tablas en versiones nuevas ─────────────────────────────
+
+add_action( 'plugins_loaded', 'mbh_maybe_update_db' );
+
+/**
+ * Comprueba si el schema de BD está desactualizado y aplica las migraciones necesarias.
+ */
+function mbh_maybe_update_db(): void {
+	$installed = get_option( 'mbh_db_version', '0' );
+
+	if ( version_compare( $installed, MBH_VERSION, '>=' ) ) {
+		return;
+	}
+
+	// Añade columnas nuevas en tablas existentes (dbDelta es idempotente).
+	mbh_create_tables();
+
+	global $wpdb;
+	$table = $wpdb->prefix . 'mbh_log';
+
+	// 1.4.0: ENUM ampliado con 'policy' + migración de registros históricos.
+	if ( version_compare( $installed, '1.4.0', '<' ) ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		$wpdb->query( "ALTER TABLE `{$table}` MODIFY COLUMN bounce_type ENUM('hard','soft','policy') NOT NULL" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( "UPDATE `{$table}` SET bounce_type = 'policy' WHERE action_taken = 'policy_block' AND bounce_type = 'soft'" );
+	}
 
 	update_option( 'mbh_db_version', MBH_VERSION );
 }

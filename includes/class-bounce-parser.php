@@ -62,16 +62,17 @@ class MBH_Bounce_Parser {
 	);
 
 	/**
-	 * Analiza un mensaje y extrae email destinatario y tipo de bounce.
+	 * Analiza un mensaje y extrae email destinatario, tipo de bounce y código diagnóstico.
 	 *
 	 * @param array $message Array con claves 'header' (object) y 'body' (string).
-	 * @return array{email: string|null, type: string|null}
-	 *   'type' es 'hard', 'soft' o null si no se puede determinar.
+	 * @return array{email: string|null, type: string|null, diagnostic_code: string|null}
+	 *   'type' es 'hard', 'soft', 'policy' o null si no se puede determinar.
 	 */
 	public function parse( array $message ): array {
 		$result = array(
-			'email' => null,
-			'type'  => null,
+			'email'           => null,
+			'type'            => null,
+			'diagnostic_code' => null,
 		);
 
 		$subject = isset( $message['header']->subject )
@@ -82,10 +83,31 @@ class MBH_Bounce_Parser {
 			return $result;
 		}
 
-		$result['email'] = $this->extract_email( $message['header'], $message['body'] );
-		$result['type']  = $this->classify_bounce( $message['body'] );
+		$result['email']           = $this->extract_email( $message['header'], $message['body'] );
+		$result['type']            = $this->classify_bounce( $message['body'] );
+		$result['diagnostic_code'] = $this->extract_diagnostic_code( $message['body'] );
 
 		return $result;
+	}
+
+	/**
+	 * Extrae el código de diagnóstico SMTP del cuerpo del mensaje.
+	 *
+	 * Prioridad: campo Diagnostic-Code (RFC 3464) → campo Status.
+	 *
+	 * @param string $body Cuerpo completo del mensaje.
+	 * @return string|null
+	 */
+	private function extract_diagnostic_code( string $body ): ?string {
+		if ( preg_match( '/Diagnostic-Code:\s*(?:\S+;\s*)?(.+)/i', $body, $m ) ) {
+			return trim( $m[1] );
+		}
+
+		if ( preg_match( '/Status:\s*([45]\.\d+\.\d+)/i', $body, $m ) ) {
+			return $m[1];
+		}
+
+		return null;
 	}
 
 	/**
