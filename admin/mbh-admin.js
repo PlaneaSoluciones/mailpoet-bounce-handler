@@ -81,6 +81,58 @@
 				}
 			);
 
+			// ── Acciones de suscriptor en el log ────────────────────────────────
+			$( document ).on(
+				'click',
+				'.mbh-action-btn',
+				function () {
+					var $btn       = $( this );
+					var email      = $btn.data( 'email' );
+					var actionType = $btn.data( 'action-type' );
+					var nonce      = $btn.data( 'nonce' );
+
+					$btn.prop( 'disabled', true );
+
+					$.post(
+						mbhAdmin.ajaxUrl,
+						{
+							action:      'mbh_change_subscriber_status',
+							nonce:       nonce,
+							email:       email,
+							action_type: actionType
+						},
+						function ( response ) {
+							if ( response.success ) {
+								var $cell       = $btn.closest( 'td' );
+								var inverseType = ( 'reactivate' === actionType ) ? 'bounce' : 'reactivate';
+								var newLabel    = ( 'reactivate' === inverseType )
+									? 'Reactivar'
+									: 'Marcar rebotado';
+								var newClass    = ( 'reactivate' === inverseType )
+									? 'button button-small mbh-action-btn'
+									: 'button button-small button-link-delete mbh-action-btn';
+
+								$cell.html(
+									'<button class="' + newClass + '" ' +
+									'data-email="' + $( '<span>' ).text( email ).html() + '" ' +
+									'data-action-type="' + inverseType + '" ' +
+									'data-nonce="' + nonce + '">' +
+									newLabel + '</button>'
+								);
+							} else {
+								alert( response.data || 'Error al actualizar el estado.' );
+								$btn.prop( 'disabled', false );
+							}
+						}
+					).fail(
+						function () {
+							alert( 'Error de conexión con el servidor.' );
+							$btn.prop( 'disabled', false );
+						}
+					);
+				}
+			);
+
 		}
 	);
 }(jQuery));

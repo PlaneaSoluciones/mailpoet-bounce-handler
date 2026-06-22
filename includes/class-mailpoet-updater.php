@@ -32,16 +32,14 @@ class MBH_MailPoet_Updater {
 	 * Cambia el estado de un suscriptor a 'bounced'.
 	 *
 	 * @param string $email Dirección de correo.
-	 * @return array{before: string, after: string}|null Null si el suscriptor no existe.
+	 * @return int|null ID del suscriptor, o null si no existe o falla.
 	 */
-	public function mark_as_bounced( string $email ): ?array {
+	public function mark_as_bounced( string $email ): ?int {
 		$subscriber = $this->get_subscriber( $email );
 
 		if ( null === $subscriber ) {
 			return null;
 		}
-
-		$status_before = $subscriber['status'] ?? 'unknown';
 
 		try {
 			\MailPoet\API\API::MP( 'v1' )->updateSubscriber(
@@ -52,10 +50,55 @@ class MBH_MailPoet_Updater {
 			return null;
 		}
 
-		return array(
-			'before' => $status_before,
-			'after'  => 'bounced',
-		);
+		return (int) $subscriber['id'];
+	}
+
+	/**
+	 * Cambia el estado de un suscriptor a 'subscribed'.
+	 *
+	 * @param string $email Dirección de correo.
+	 * @return bool True si el cambio se aplicó correctamente.
+	 */
+	public function reactivate_subscriber( string $email ): bool {
+		$subscriber = $this->get_subscriber( $email );
+
+		if ( null === $subscriber ) {
+			return false;
+		}
+
+		try {
+			\MailPoet\API\API::MP( 'v1' )->updateSubscriber(
+				$subscriber['id'],
+				array( 'status' => 'subscribed' )
+			);
+			return true;
+		} catch ( \Throwable $e ) {
+			return false;
+		}
+	}
+
+	/**
+	 * Cambia el estado de un suscriptor a 'bounced' de forma manual.
+	 *
+	 * @param string $email Dirección de correo.
+	 * @return bool True si el cambio se aplicó correctamente.
+	 */
+	public function force_bounce_subscriber( string $email ): bool {
+		$subscriber = $this->get_subscriber( $email );
+
+		if ( null === $subscriber ) {
+			return false;
+		}
+
+		try {
+			\MailPoet\API\API::MP( 'v1' )->updateSubscriber(
+				$subscriber['id'],
+				array( 'status' => 'bounced' )
+			);
+			return true;
+		} catch ( \Throwable $e ) {
+			return false;
+		}
 	}
 
 	/**

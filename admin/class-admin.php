@@ -43,6 +43,7 @@ class MBH_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'wp_ajax_mbh_test_connection', array( $this, 'ajax_test_connection' ) );
 		add_action( 'wp_ajax_mbh_process_now', array( $this, 'ajax_process_now' ) );
+		add_action( 'wp_ajax_mbh_change_subscriber_status', array( $this, 'ajax_change_subscriber_status' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_filter( 'plugin_action_links_' . plugin_basename( MBH_PLUGIN_FILE ), array( $this, 'add_action_links' ) );
 	}
@@ -270,6 +271,38 @@ class MBH_Admin {
 	}
 
 	/**
+	 * AJAX: cambia el estado de un suscriptor en MailPoet desde el log.
+	 */
+	public function ajax_change_subscriber_status(): void {
+		check_ajax_referer( 'mbh_change_subscriber_status', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Sin permisos.', 'mailpoet-bounce-handler' ) );
+		}
+
+		$email       = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+		$action_type = sanitize_key( wp_unslash( $_POST['action_type'] ?? '' ) );
+
+		if ( ! is_email( $email ) || ! in_array( $action_type, array( 'reactivate', 'bounce' ), true ) ) {
+			wp_send_json_error( __( 'Datos inválidos.', 'mailpoet-bounce-handler' ) );
+		}
+
+		$updater = new MBH_MailPoet_Updater();
+
+		if ( 'reactivate' === $action_type ) {
+			$success = $updater->reactivate_subscriber( $email );
+		} else {
+			$success = $updater->force_bounce_subscriber( $email );
+		}
+
+		if ( $success ) {
+			wp_send_json_success( array( 'new_status' => $updater->get_subscriber_status( $email ) ) );
+		} else {
+			wp_send_json_error( __( 'No se pudo actualizar el estado del suscriptor.', 'mailpoet-bounce-handler' ) );
+		}
+	}
+
+	/**
 	 * Exporta el log completo (o filtrado) como CSV.
 	 */
 	private function export_csv(): void {
@@ -305,8 +338,6 @@ class MBH_Admin {
 				__( 'Tipo', 'mailpoet-bounce-handler' ),
 				__( 'Intentos soft', 'mailpoet-bounce-handler' ),
 				__( 'Acción', 'mailpoet-bounce-handler' ),
-				__( 'Estado anterior', 'mailpoet-bounce-handler' ),
-				__( 'Estado posterior', 'mailpoet-bounce-handler' ),
 				__( 'Diagnóstico', 'mailpoet-bounce-handler' ),
 				__( 'Asunto', 'mailpoet-bounce-handler' ),
 			)
@@ -321,8 +352,6 @@ class MBH_Admin {
 					$row->bounce_type,
 					$row->soft_count,
 					$row->action_taken,
-					$row->status_before,
-					$row->status_after,
 					$row->diagnostic_code ?? '',
 					$row->raw_subject,
 				)

@@ -260,7 +260,7 @@ function mbh_run_bounce_processing(): array {
 		$diagnostic_code = $parsed['diagnostic_code'] ?? null;
 
 		if ( 'hard' === $type ) {
-			$status = $updater->mark_as_bounced( $email );
+			$subscriber_id = $updater->mark_as_bounced( $email );
 			$logger->reset_soft_count( $email );
 
 			$logger->log_bounce(
@@ -269,8 +269,7 @@ function mbh_run_bounce_processing(): array {
 					'bounce_type'     => 'hard',
 					'soft_count'      => 0,
 					'action_taken'    => 'marked_bounced',
-					'status_before'   => $status['before'] ?? '',
-					'status_after'    => $status['after'] ?? '',
+					'subscriber_id'   => $subscriber_id,
 					'raw_subject'     => $subject,
 					'diagnostic_code' => $diagnostic_code,
 				)
@@ -282,7 +281,7 @@ function mbh_run_bounce_processing(): array {
 			$soft_count = $logger->increment_soft_count( $email );
 
 			if ( $soft_count >= $threshold ) {
-				$status = $updater->mark_as_bounced( $email );
+				$subscriber_id = $updater->mark_as_bounced( $email );
 				$logger->reset_soft_count( $email );
 
 				$logger->log_bounce(
@@ -291,8 +290,7 @@ function mbh_run_bounce_processing(): array {
 						'bounce_type'     => 'soft',
 						'soft_count'      => $soft_count,
 						'action_taken'    => 'marked_bounced_threshold',
-						'status_before'   => $status['before'] ?? '',
-						'status_after'    => $status['after'] ?? '',
+						'subscriber_id'   => $subscriber_id,
 						'raw_subject'     => $subject,
 						'diagnostic_code' => $diagnostic_code,
 					)
@@ -300,15 +298,14 @@ function mbh_run_bounce_processing(): array {
 
 				$results['soft_threshold_reached'][] = array( 'email' => $email );
 			} else {
-				$current_status = $updater->get_subscriber_status( $email ) ?? '';
+				$subscriber = $updater->get_subscriber( $email );
 				$logger->log_bounce(
 					array(
 						'email'           => $email,
 						'bounce_type'     => 'soft',
 						'soft_count'      => $soft_count,
 						'action_taken'    => 'soft_count_incremented',
-						'status_before'   => $current_status,
-						'status_after'    => $current_status,
+						'subscriber_id'   => $subscriber ? (int) $subscriber['id'] : null,
 						'raw_subject'     => $subject,
 						'diagnostic_code' => $diagnostic_code,
 					)
@@ -318,15 +315,14 @@ function mbh_run_bounce_processing(): array {
 			}
 		} elseif ( 'policy' === $type ) {
 			// Bloqueo por política/reputación: no marcar el suscriptor, solo registrar y alertar.
-			$current_status = $updater->get_subscriber_status( $email ) ?? '';
+			$subscriber = $updater->get_subscriber( $email );
 			$logger->log_bounce(
 				array(
 					'email'           => $email,
 					'bounce_type'     => 'policy',
 					'soft_count'      => 0,
 					'action_taken'    => 'policy_block',
-					'status_before'   => $current_status,
-					'status_after'    => $current_status,
+					'subscriber_id'   => $subscriber ? (int) $subscriber['id'] : null,
 					'raw_subject'     => $subject,
 					'diagnostic_code' => $diagnostic_code,
 				)
@@ -373,8 +369,7 @@ function mbh_create_tables(): void {
 		bounce_type ENUM('hard','soft','policy') NOT NULL,
 		soft_count TINYINT DEFAULT 0,
 		action_taken VARCHAR(100) DEFAULT '',
-		status_before VARCHAR(50) DEFAULT '',
-		status_after VARCHAR(50) DEFAULT '',
+		subscriber_id INT DEFAULT NULL,
 		raw_subject TEXT,
 		diagnostic_code TEXT DEFAULT NULL,
 		PRIMARY KEY (id),
@@ -423,6 +418,19 @@ function mbh_maybe_update_db(): void {
 		$wpdb->query( "ALTER TABLE `{$table}` MODIFY COLUMN bounce_type ENUM('hard','soft','policy') NOT NULL" );
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( "UPDATE `{$table}` SET bounce_type = 'policy' WHERE action_taken = 'policy_block' AND bounce_type = 'soft'" );
+	}
+
+	// 1.5.0: añade subscriber_id, elimina columnas status_before y status_after.
+	if ( version_compare( $installed, '1.5.0', '<' ) ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$existing_cols = $wpdb->get_col( "SHOW COLUMNS FROM `{$table}`", 0 );
+		foreach ( array( 'status_before', 'status_after' ) as $col ) {
+			if ( in_array( $col, $existing_cols, true ) ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				$wpdb->query( "ALTER TABLE `{$table}` DROP COLUMN `{$col}`" );
+			}
+		}
+		// subscriber_id se añade por dbDelta en mbh_create_tables().
 	}
 
 	update_option( 'mbh_db_version', MBH_VERSION );

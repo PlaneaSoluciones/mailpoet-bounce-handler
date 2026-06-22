@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $logger   = new MBH_Logger();
+$updater  = new MBH_MailPoet_Updater();
 $mbh_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 $filters  = array(
 	'bounce_type' => isset( $_GET['bounce_type'] ) ? sanitize_text_field( wp_unslash( $_GET['bounce_type'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -36,6 +37,8 @@ $export_url   = add_query_arg(
 	),
 	admin_url( 'admin.php' )
 );
+
+$action_nonce = wp_create_nonce( 'mbh_change_subscriber_status' );
 ?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Bounce Handler — Log', 'mailpoet-bounce-handler' ); ?></h1>
@@ -82,8 +85,7 @@ $export_url   = add_query_arg(
 				<th style="width:60px"><?php esc_html_e( 'Tipo', 'mailpoet-bounce-handler' ); ?></th>
 				<th style="width:60px"><?php esc_html_e( 'Intentos soft', 'mailpoet-bounce-handler' ); ?></th>
 				<th style="width:160px"><?php esc_html_e( 'Acción', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:90px"><?php esc_html_e( 'Estado anterior', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:90px"><?php esc_html_e( 'Estado posterior', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:130px"><?php esc_html_e( 'Acciones', 'mailpoet-bounce-handler' ); ?></th>
 				<th><?php esc_html_e( 'Diagnóstico', 'mailpoet-bounce-handler' ); ?></th>
 			</tr>
 		</thead>
@@ -91,7 +93,16 @@ $export_url   = add_query_arg(
 			<?php foreach ( $items as $row ) : ?>
 			<tr>
 				<td><?php echo esc_html( $row->processed_at ); ?></td>
-				<td><?php echo esc_html( $row->email ); ?></td>
+				<td>
+					<?php
+					if ( ! empty( $row->subscriber_id ) ) {
+						$edit_url = admin_url( 'admin.php?page=mailpoet-subscribers#/edit-subscriber/' . (int) $row->subscriber_id );
+						echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( $row->email ) . '</a>';
+					} else {
+						echo esc_html( $row->email );
+					}
+					?>
+				</td>
 				<td>
 					<?php
 					$type_colors = array(
@@ -107,8 +118,26 @@ $export_url   = add_query_arg(
 				</td>
 				<td><?php echo esc_html( $row->soft_count ); ?></td>
 				<td><?php echo esc_html( $row->action_taken ); ?></td>
-				<td><?php echo esc_html( $row->status_before ); ?></td>
-				<td><?php echo esc_html( $row->status_after ); ?></td>
+				<td>
+					<?php
+					$current_status = $updater->get_subscriber_status( $row->email );
+					if ( 'bounced' === $current_status ) :
+						?>
+						<button class="button button-small mbh-action-btn"
+								data-email="<?php echo esc_attr( $row->email ); ?>"
+								data-action-type="reactivate"
+								data-nonce="<?php echo esc_attr( $action_nonce ); ?>">
+							<?php esc_html_e( 'Reactivar', 'mailpoet-bounce-handler' ); ?>
+						</button>
+					<?php elseif ( in_array( $current_status, array( 'subscribed', 'inactive', 'unconfirmed' ), true ) ) : ?>
+						<button class="button button-small button-link-delete mbh-action-btn"
+								data-email="<?php echo esc_attr( $row->email ); ?>"
+								data-action-type="bounce"
+								data-nonce="<?php echo esc_attr( $action_nonce ); ?>">
+							<?php esc_html_e( 'Marcar rebotado', 'mailpoet-bounce-handler' ); ?>
+						</button>
+					<?php endif; ?>
+				</td>
 				<td>
 					<?php
 					$diag = $row->diagnostic_code ?? '';
