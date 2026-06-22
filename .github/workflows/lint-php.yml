@@ -1,0 +1,43 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  php-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - name: PHP syntax check
+        run: find . -name "*.php" -not -path "*/vendor/*" -print0 | xargs -0 -n1 php -l
+
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      # Requiere phpcs.xml en la raíz del proyecto con las reglas configuradas
+      - name: PHPCS
+        run: vendor/bin/phpcs
+
+  phpstan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+      # Level 5 por defecto; ajustar en phpstan.neon del proyecto si es necesario
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=768M

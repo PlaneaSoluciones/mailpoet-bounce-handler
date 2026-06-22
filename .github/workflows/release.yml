@@ -24,11 +24,13 @@ jobs:
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
+            --exclude='.claude' \
             --exclude='vendor' \
             --exclude='scripts' \
             --exclude='composer.json' \
             --exclude='composer.lock' \
-            --exclude='.phpcs.xml.dist' \
+            --exclude='phpcs.xml' \
+            --exclude='phpstan.neon' \
             --exclude='.editorconfig' \
             --exclude='.gitignore' \
             --exclude='.gitattributes' \

@@ -1,0 +1,11 @@
+parameters:
+    level: 5
+    bootstrapFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+    paths:
+        - mailpoet-bounce-handler.php
+        - includes/
+        - admin/
+        - uninstall.php
+    excludePaths:
+        - vendor/
