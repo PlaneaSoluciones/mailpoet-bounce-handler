@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<ruleset name="MailPoet Bounce Handler">
+    <description>WordPress Coding Standards para mailpoet-bounce-handler</description>
+
+    <file>.</file>
+    <exclude-pattern>vendor/</exclude-pattern>
+    <exclude-pattern>node_modules/</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="WordPress"/>
+
+    <!-- Las tablas propias del plugin (mbh_log, mbh_soft_counts) requieren
+         queries directas; el caching no aplica en queries de escritura/admin. -->
+    <rule ref="WordPress.DB.DirectDatabaseQuery">
+        <severity>0</severity>
+    </rule>
+
+    <!-- El export CSV usa fclose() sobre un stream php://output, no sobre el sistema
+         de ficheros — WP_Filesystem no aplica aquí. -->
+    <rule ref="WordPress.WP.AlternativeFunctions.file_system_operations_fclose">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Las clases usan el prefijo MBH_ pero los ficheros se llaman class-<nombre>.php
+         (sin prefijo): convención deliberada del proyecto. -->
+    <rule ref="WordPress.Files.FileName.InvalidClassFileName">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Falsos positivos en queries dinámicas con WHERE construido en runtime;
+         las queries usan $wpdb->prepare() correctamente. -->
+    <rule ref="WordPress.DB.PreparedSQLPlaceholders">
+        <severity>0</severity>
+    </rule>
+
+    <config name="minimum_supported_wp_version" value="6.2"/>
+    <config name="text_domain" value="mailpoet-bounce-handler"/>
+</ruleset>
