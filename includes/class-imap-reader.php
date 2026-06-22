@@ -102,7 +102,7 @@ class MBH_IMAP_Reader {
 	}
 
 	/**
-	 * Marca un mensaje para borrado y lo expunge inmediatamente.
+	 * Marca un mensaje para borrado (el expunge ocurre al cerrar la conexión).
 	 *
 	 * @param int $msg_num Número de mensaje en el buzón.
 	 */
@@ -112,15 +112,14 @@ class MBH_IMAP_Reader {
 		}
 
 		imap_delete( $this->stream, $msg_num );
-		imap_expunge( $this->stream );
 	}
 
 	/**
-	 * Cierra la conexión IMAP.
+	 * Cierra la conexión IMAP y expunge los mensajes marcados para borrado.
 	 */
 	public function close(): void {
 		if ( false !== $this->stream ) {
-			imap_close( $this->stream );
+			imap_close( $this->stream, CL_EXPUNGE );
 			$this->stream = false;
 		}
 	}
