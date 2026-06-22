@@ -1,0 +1,72 @@
+/* Kebab menu en el log de bounces */
+.mbh-row-actions {
+	position: relative;
+	display: inline-block;
+}
+
+.mbh-actions-toggle {
+	padding: 2px 6px;
+	color: #72777c;
+	font-size: 18px;
+	line-height: 1;
+	border-radius: 4px;
+	background: transparent;
+	border: 1px solid transparent;
+	cursor: pointer;
+	vertical-align: middle;
+}
+
+.mbh-actions-toggle:hover,
+.mbh-actions-toggle[aria-expanded="true"] {
+	background: #f0f0f1;
+	color: #1d2327;
+	border-color: #dcdcde;
+}
+
+.mbh-actions-dropdown {
+	position: absolute;
+	right: 0;
+	top: calc(100% + 4px);
+	z-index: 200;
+	min-width: 160px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+	overflow: hidden;
+}
+
+.mbh-actions-dropdown[hidden] {
+	display: none;
+}
+
+.mbh-dropdown-item {
+	display: block;
+	width: 100%;
+	padding: 8px 14px;
+	text-align: left;
+	background: none;
+	border: none;
+	border-bottom: 1px solid #f0f0f1;
+	cursor: pointer;
+	font-size: 13px;
+	color: #1d2327;
+	line-height: 1.4;
+}
+
+.mbh-dropdown-item:last-child {
+	border-bottom: none;
+}
+
+.mbh-dropdown-item:hover {
+	background: #f6f7f7;
+}
+
+.mbh-dropdown-item:disabled {
+	opacity: .5;
+	cursor: default;
+}
+
+.mbh-dropdown-item.is-destructive {
+	color: #d63638;
+}

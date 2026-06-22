@@ -1,6 +1,6 @@
 <?php
 /**
- * Vista del log de bounces con filtros, paginación y export CSV.
+ * Vista del log de bounces con filtros, paginación, ordenación y export CSV.
  *
  * @package MailPoet_Bounce_Handler
  */
@@ -18,8 +18,14 @@ $filters  = array(
 	'date_to'     => isset( $_GET['date_to'] ) ? sanitize_text_field( wp_unslash( $_GET['date_to'] ) ) : '',         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 );
 
+$allowed_orderby = array( 'processed_at', 'email', 'bounce_type', 'soft_count' );
+$cur_orderby     = ( isset( $_GET['orderby'] ) && in_array( sanitize_key( wp_unslash( $_GET['orderby'] ) ), $allowed_orderby, true ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	? sanitize_key( wp_unslash( $_GET['orderby'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	: 'processed_at';
+$cur_order       = ( isset( $_GET['order'] ) && 'asc' === $_GET['order'] ) ? 'asc' : 'desc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
 $mbh_per_page = 25;
-$data         = $logger->get_logs( $filters, $mbh_page, $mbh_per_page );
+$data         = $logger->get_logs( $filters, $mbh_page, $mbh_per_page, $cur_orderby, strtoupper( $cur_order ) );
 $items        = $data['items'];
 $total        = $data['total'];
 $mbh_pages    = (int) ceil( $total / $mbh_per_page );
@@ -39,6 +45,40 @@ $export_url   = add_query_arg(
 );
 
 $action_nonce = wp_create_nonce( 'mbh_change_subscriber_status' );
+
+/**
+ * Genera un <th> con enlace de ordenación estilo WP_List_Table.
+ *
+ * @param string $label       Texto visible.
+ * @param string $col         Nombre de la columna en BD.
+ * @param string $cur_orderby Columna actualmente ordenada.
+ * @param string $cur_order   Dirección actual ('asc'|'desc').
+ * @param string $base_url    URL base de la página.
+ * @param string $width       Valor CSS de width (opcional).
+ * @return string HTML del <th>.
+ */
+$mbh_th = static function ( string $label, string $col, string $cur_orderby, string $cur_order, string $base_url, string $width = '' ): string {
+	$is_active  = $col === $cur_orderby;
+	$next_order = ( $is_active && 'asc' === $cur_order ) ? 'desc' : 'asc';
+	$class      = 'manage-column column-' . $col . ( $is_active ? " sorted {$cur_order}" : ' sortable desc' );
+	$href       = add_query_arg(
+		array(
+			'orderby' => $col,
+			'order'   => $next_order,
+			'paged'   => '1',
+		),
+		$base_url
+	);
+	$style      = $width ? ' style="width:' . esc_attr( $width ) . '"' : '';
+
+	return '<th scope="col" class="' . esc_attr( $class ) . '"' . $style . '>'
+		. '<a href="' . esc_url( $href ) . '">'
+		. '<span>' . esc_html( $label ) . '</span>'
+		. '<span class="sorting-indicators">'
+		. '<span class="sorting-indicator asc" aria-hidden="true"></span>'
+		. '<span class="sorting-indicator desc" aria-hidden="true"></span>'
+		. '</span></a></th>';
+};
 ?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Bounce Handler — Log', 'mailpoet-bounce-handler' ); ?></h1>
@@ -80,23 +120,33 @@ $action_nonce = wp_create_nonce( 'mbh_change_subscriber_status' );
 	<table class="wp-list-table widefat fixed striped">
 		<thead>
 			<tr>
-				<th style="width:130px"><?php esc_html_e( 'Fecha', 'mailpoet-bounce-handler' ); ?></th>
-				<th><?php esc_html_e( 'Email', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:60px"><?php esc_html_e( 'Tipo', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:60px"><?php esc_html_e( 'Intentos soft', 'mailpoet-bounce-handler' ); ?></th>
+				<?php
+				echo wp_kses_post( $mbh_th( __( 'Fecha', 'mailpoet-bounce-handler' ), 'processed_at', $cur_orderby, $cur_order, $base_url, '130px' ) );
+				echo wp_kses_post( $mbh_th( __( 'Email', 'mailpoet-bounce-handler' ), 'email', $cur_orderby, $cur_order, $base_url ) );
+				echo wp_kses_post( $mbh_th( __( 'Tipo', 'mailpoet-bounce-handler' ), 'bounce_type', $cur_orderby, $cur_order, $base_url, '60px' ) );
+				echo wp_kses_post( $mbh_th( __( 'Intentos soft', 'mailpoet-bounce-handler' ), 'soft_count', $cur_orderby, $cur_order, $base_url, '80px' ) );
+				?>
 				<th style="width:160px"><?php esc_html_e( 'Acción', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:130px"><?php esc_html_e( 'Acciones', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:40px;text-align:center"><?php esc_html_e( 'Acciones', 'mailpoet-bounce-handler' ); ?></th>
 				<th><?php esc_html_e( 'Diagnóstico', 'mailpoet-bounce-handler' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
 			<?php foreach ( $items as $row ) : ?>
+				<?php
+				// Una sola llamada por fila: obtiene id y status actuales en MailPoet.
+				$sub_data      = $updater->get_subscriber( $row->email );
+				$subscriber_id = $sub_data
+				? (int) $sub_data['id']
+				: ( ! empty( $row->subscriber_id ) ? (int) $row->subscriber_id : null );
+				$sub_status    = $sub_data['status'] ?? null;
+				?>
 			<tr>
 				<td><?php echo esc_html( $row->processed_at ); ?></td>
 				<td>
 					<?php
-					if ( ! empty( $row->subscriber_id ) ) {
-						$edit_url = admin_url( 'admin.php?page=mailpoet-subscribers#/edit-subscriber/' . (int) $row->subscriber_id );
+					if ( $subscriber_id ) {
+						$edit_url = admin_url( 'admin.php?page=mailpoet-subscribers#/edit-subscriber/' . $subscriber_id );
 						echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( $row->email ) . '</a>';
 					} else {
 						echo esc_html( $row->email );
@@ -118,24 +168,31 @@ $action_nonce = wp_create_nonce( 'mbh_change_subscriber_status' );
 				</td>
 				<td><?php echo esc_html( $row->soft_count ); ?></td>
 				<td><?php echo esc_html( $row->action_taken ); ?></td>
-				<td>
-					<?php
-					$current_status = $updater->get_subscriber_status( $row->email );
-					if ( 'bounced' === $current_status ) :
-						?>
-						<button class="button button-small mbh-action-btn"
-								data-email="<?php echo esc_attr( $row->email ); ?>"
-								data-action-type="reactivate"
-								data-nonce="<?php echo esc_attr( $action_nonce ); ?>">
-							<?php esc_html_e( 'Reactivar', 'mailpoet-bounce-handler' ); ?>
+				<td style="text-align:center">
+					<?php if ( 'bounced' === $sub_status || in_array( $sub_status, array( 'subscribed', 'inactive', 'unconfirmed' ), true ) ) : ?>
+					<div class="mbh-row-actions">
+						<button type="button" class="button-link mbh-actions-toggle" aria-haspopup="true" aria-expanded="false">
+							<span class="dashicons dashicons-ellipsis" aria-hidden="true"></span>
+							<span class="screen-reader-text"><?php esc_html_e( 'Acciones', 'mailpoet-bounce-handler' ); ?></span>
 						</button>
-					<?php elseif ( in_array( $current_status, array( 'subscribed', 'inactive', 'unconfirmed' ), true ) ) : ?>
-						<button class="button button-small button-link-delete mbh-action-btn"
-								data-email="<?php echo esc_attr( $row->email ); ?>"
-								data-action-type="bounce"
-								data-nonce="<?php echo esc_attr( $action_nonce ); ?>">
-							<?php esc_html_e( 'Marcar rebotado', 'mailpoet-bounce-handler' ); ?>
-						</button>
+						<div class="mbh-actions-dropdown" hidden role="menu">
+							<?php if ( 'bounced' === $sub_status ) : ?>
+							<button type="button" class="mbh-dropdown-item mbh-action-btn" role="menuitem"
+									data-email="<?php echo esc_attr( $row->email ); ?>"
+									data-action-type="reactivate"
+									data-nonce="<?php echo esc_attr( $action_nonce ); ?>">
+								<?php esc_html_e( 'Reactivar', 'mailpoet-bounce-handler' ); ?>
+							</button>
+							<?php else : ?>
+							<button type="button" class="mbh-dropdown-item mbh-action-btn is-destructive" role="menuitem"
+									data-email="<?php echo esc_attr( $row->email ); ?>"
+									data-action-type="bounce"
+									data-nonce="<?php echo esc_attr( $action_nonce ); ?>">
+								<?php esc_html_e( 'Marcar rebotado', 'mailpoet-bounce-handler' ); ?>
+							</button>
+							<?php endif; ?>
+						</div>
+					</div>
 					<?php endif; ?>
 				</td>
 				<td>

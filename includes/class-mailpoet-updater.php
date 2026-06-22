@@ -47,7 +47,21 @@ class MBH_MailPoet_Updater {
 				array( 'status' => 'bounced' )
 			);
 		} catch ( \Throwable $e ) {
-			return null;
+			// Fallback: escritura directa si la API rechaza el estado 'bounced'.
+			global $wpdb;
+			$result = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->prefix . 'mailpoet_subscribers',
+				array(
+					'status'     => 'bounced',
+					'updated_at' => current_time( 'mysql' ),
+				),
+				array( 'id' => (int) $subscriber['id'] ),
+				array( '%s', '%s' ),
+				array( '%d' )
+			);
+			if ( false === $result ) {
+				return null;
+			}
 		}
 
 		return (int) $subscriber['id'];
@@ -97,7 +111,19 @@ class MBH_MailPoet_Updater {
 			);
 			return true;
 		} catch ( \Throwable $e ) {
-			return false;
+			// Fallback: escritura directa si la API rechaza el estado 'bounced'.
+			global $wpdb;
+			$result = $wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$wpdb->prefix . 'mailpoet_subscribers',
+				array(
+					'status'     => 'bounced',
+					'updated_at' => current_time( 'mysql' ),
+				),
+				array( 'id' => (int) $subscriber['id'] ),
+				array( '%s', '%s' ),
+				array( '%d' )
+			);
+			return false !== $result;
 		}
 	}
 
