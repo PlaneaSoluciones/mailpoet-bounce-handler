@@ -150,6 +150,13 @@ class MBH_Admin {
 			return;
 		}
 
+		wp_enqueue_style(
+			'mbh-admin',
+			plugins_url( 'admin/mbh-admin.css', MBH_PLUGIN_FILE ),
+			array(),
+			MBH_VERSION
+		);
+
 		wp_enqueue_script(
 			'mbh-admin',
 			plugins_url( 'admin/mbh-admin.js', MBH_PLUGIN_FILE ),

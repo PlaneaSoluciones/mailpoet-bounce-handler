@@ -7,6 +7,18 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-06-22
+
+### Añadido
+
+- Columna "Acciones" con menú desplegable (⋮) estilo MailPoet: muestra "Reactivar" o "Marcar rebotado" según el estado actual del suscriptor en MailPoet. Pulsar fuera del menú lo cierra.
+- La dirección de email en el log enlaza a la ficha del suscriptor también en registros anteriores a v1.5.0 (busca el suscriptor en MailPoet por email en tiempo real).
+- Columnas "Fecha", "Email", "Tipo" e "Intentos soft" son ahora ordenables al pulsar su cabecera, con flechas de dirección estilo WordPress.
+
+### Corregido
+
+- "Marcar rebotado" fallaba en ciertos entornos porque la API pública de MailPoet rechazaba el estado `bounced`. Se añade escritura directa en la tabla de MailPoet como fallback, aplicado también al procesado automático de bounces hard.
+
 ## [1.5.0] - 2026-06-22
 
 ### Añadido

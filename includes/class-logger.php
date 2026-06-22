@@ -126,13 +126,19 @@ class MBH_Logger {
 	/**
 	 * Retorna entradas del log con filtros opcionales.
 	 *
-	 * @param array $filters  Filtros: 'bounce_type', 'date_from', 'date_to'.
-	 * @param int   $page     Página actual (1-based).
-	 * @param int   $per_page Resultados por página.
+	 * @param array  $filters  Filtros: 'bounce_type', 'date_from', 'date_to'.
+	 * @param int    $page     Página actual (1-based).
+	 * @param int    $per_page Resultados por página.
+	 * @param string $orderby  Columna por la que ordenar.
+	 * @param string $order    Dirección: 'ASC' o 'DESC'.
 	 * @return array{items: array, total: int}
 	 */
-	public function get_logs( array $filters = array(), int $page = 1, int $per_page = 25 ): array {
+	public function get_logs( array $filters = array(), int $page = 1, int $per_page = 25, string $orderby = 'processed_at', string $order = 'DESC' ): array {
 		global $wpdb;
+
+		$allowed_orderby = array( 'processed_at', 'email', 'bounce_type', 'soft_count' );
+		$orderby         = in_array( $orderby, $allowed_orderby, true ) ? $orderby : 'processed_at';
+		$order           = 'ASC' === strtoupper( $order ) ? 'ASC' : 'DESC';
 
 		$table  = $wpdb->prefix . 'mbh_log';
 		$where  = array( '1=1' );
@@ -156,7 +162,7 @@ class MBH_Logger {
 		$where_sql = implode( ' AND ', $where );
 		$offset    = ( $page - 1 ) * $per_page;
 
-		$base_query = "SELECT * FROM `{$table}` WHERE {$where_sql} ORDER BY processed_at DESC"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$base_query = "SELECT * FROM `{$table}` WHERE {$where_sql} ORDER BY {$orderby} {$order}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		if ( ! empty( $params ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared

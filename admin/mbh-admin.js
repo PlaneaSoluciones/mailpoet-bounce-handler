@@ -81,15 +81,47 @@
 				}
 			);
 
+			// ── Kebab menu — abrir/cerrar ───────────────────────────────────────
+			$( document ).on(
+				'click',
+				'.mbh-actions-toggle',
+				function ( e ) {
+					e.stopPropagation();
+					var $toggle   = $( this );
+					var $dropdown = $toggle.next( '.mbh-actions-dropdown' );
+					var isOpen    = ! $dropdown.attr( 'hidden' );
+
+					// Cerrar todos los menús abiertos.
+					$( '.mbh-actions-dropdown' ).attr( 'hidden', true );
+					$( '.mbh-actions-toggle' ).attr( 'aria-expanded', 'false' );
+
+					if ( ! isOpen ) {
+						$dropdown.removeAttr( 'hidden' );
+						$toggle.attr( 'aria-expanded', 'true' );
+					}
+				}
+			);
+
+			$( document ).on(
+				'click',
+				function () {
+					$( '.mbh-actions-dropdown' ).attr( 'hidden', true );
+					$( '.mbh-actions-toggle' ).attr( 'aria-expanded', 'false' );
+				}
+			);
+
 			// ── Acciones de suscriptor en el log ────────────────────────────────
 			$( document ).on(
 				'click',
 				'.mbh-action-btn',
-				function () {
+				function ( e ) {
+					e.stopPropagation();
 					var $btn       = $( this );
 					var email      = $btn.data( 'email' );
 					var actionType = $btn.data( 'action-type' );
 					var nonce      = $btn.data( 'nonce' );
+					var $dropdown  = $btn.closest( '.mbh-actions-dropdown' );
+					var $toggle    = $dropdown.prev( '.mbh-actions-toggle' );
 
 					$btn.prop( 'disabled', true );
 
@@ -103,22 +135,24 @@
 						},
 						function ( response ) {
 							if ( response.success ) {
-								var $cell       = $btn.closest( 'td' );
-								var inverseType = ( 'reactivate' === actionType ) ? 'bounce' : 'reactivate';
-								var newLabel    = ( 'reactivate' === inverseType )
-									? 'Reactivar'
-									: 'Marcar rebotado';
-								var newClass    = ( 'reactivate' === inverseType )
-									? 'button button-small mbh-action-btn'
-									: 'button button-small button-link-delete mbh-action-btn';
+								var inverseType  = ( 'reactivate' === actionType ) ? 'bounce' : 'reactivate';
+								var newLabel     = ( 'reactivate' === inverseType ) ? 'Reactivar' : 'Marcar rebotado';
+								var newClass     = 'mbh-dropdown-item mbh-action-btn'
+									+ ( 'reactivate' === inverseType ? '' : ' is-destructive' );
+								var safeEmail    = $( '<span>' ).text( email ).html();
 
-								$cell.html(
-									'<button class="' + newClass + '" ' +
-									'data-email="' + $( '<span>' ).text( email ).html() + '" ' +
-									'data-action-type="' + inverseType + '" ' +
-									'data-nonce="' + nonce + '">' +
-									newLabel + '</button>'
-								);
+								$btn
+									.removeClass( 'is-destructive' )
+									.addClass( 'reactivate' === inverseType ? '' : 'is-destructive' )
+									.data( 'action-type', inverseType )
+									.attr( 'class', newClass )
+									.text( newLabel )
+									.attr( 'data-action-type', inverseType )
+									.attr( 'data-email', safeEmail )
+									.prop( 'disabled', false );
+
+								$dropdown.attr( 'hidden', true );
+								$toggle.attr( 'aria-expanded', 'false' );
 							} else {
 								alert( response.data || 'Error al actualizar el estado.' );
 								$btn.prop( 'disabled', false );
