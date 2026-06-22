@@ -118,7 +118,15 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 - Corregidas violaciones de estilo PHPCS/WPCS y ajustada la configuración del linter.
 - El ZIP del release ahora incluye el número de versión en el nombre del archivo, manteniendo la carpeta interna con el slug del plugin para que WordPress sustituya la instalación anterior.
 
-[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.4...HEAD
+[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.4.1...v1.5.0
+[1.4.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.4.0...v1.4.1
+[1.4.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.2.1...v1.3.0
+[1.2.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.5...v1.2.0
+[1.1.5]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.4...v1.1.5
 [1.1.4]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.1.1...v1.1.2
