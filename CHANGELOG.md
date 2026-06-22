@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-06-22
+
 ### Corregido
 
 - Los correos de rebote se reprocesaban en cada ejecución del cron porque `imap_expunge()` se llamaba inmediatamente tras cada `imap_delete()`, renumerando los mensajes restantes y dejando algunos sin borrar. Ahora solo se marca para borrado con `imap_delete()` durante el bucle, y el expunge único ocurre al cerrar la conexión con `imap_close(..., CL_EXPUNGE)`.
