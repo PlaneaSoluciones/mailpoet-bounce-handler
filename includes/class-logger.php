@@ -18,7 +18,7 @@ class MBH_Logger {
 	 * Registra una entrada de bounce procesado.
 	 *
 	 * @param array $data Datos del bounce: email, bounce_type, soft_count, action_taken,
-	 *                    status_before, status_after, raw_subject, diagnostic_code.
+	 *                    subscriber_id, raw_subject, diagnostic_code.
 	 * @return int|false ID insertado o false en caso de error.
 	 */
 	public function log_bounce( array $data ) {
@@ -34,12 +34,11 @@ class MBH_Logger {
 				'bounce_type'     => $data['bounce_type'],
 				'soft_count'      => (int) ( $data['soft_count'] ?? 0 ),
 				'action_taken'    => sanitize_text_field( $data['action_taken'] ?? '' ),
-				'status_before'   => sanitize_text_field( $data['status_before'] ?? '' ),
-				'status_after'    => sanitize_text_field( $data['status_after'] ?? '' ),
+				'subscriber_id'   => isset( $data['subscriber_id'] ) ? (int) $data['subscriber_id'] : null,
 				'raw_subject'     => sanitize_text_field( $data['raw_subject'] ?? '' ),
 				'diagnostic_code' => isset( $data['diagnostic_code'] ) ? sanitize_text_field( $data['diagnostic_code'] ) : null,
 			),
-			array( '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' )
+			array( '%s', '%s', '%s', '%d', '%s', '%d', '%s', '%s' )
 		);
 
 		return $inserted ? $wpdb->insert_id : false;
