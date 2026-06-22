@@ -7,6 +7,12 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-06-22
+
+### Corregido
+
+- El enlace a la ficha del suscriptor en el log de bounces apuntaba a una ruta incorrecta (`#/edit-subscriber/ID`). Ahora usa la ruta correcta de MailPoet (`#/edit/ID`).
+
 ## [1.6.0] - 2026-06-22
 
 ### Añadido

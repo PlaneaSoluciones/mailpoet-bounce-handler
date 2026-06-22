@@ -146,7 +146,7 @@ $mbh_th = static function ( string $label, string $col, string $cur_orderby, str
 				<td>
 					<?php
 					if ( $subscriber_id ) {
-						$edit_url = admin_url( 'admin.php?page=mailpoet-subscribers#/edit-subscriber/' . $subscriber_id );
+						$edit_url = admin_url( 'admin.php?page=mailpoet-subscribers#/edit/' . $subscriber_id );
 						echo '<a href="' . esc_url( $edit_url ) . '">' . esc_html( $row->email ) . '</a>';
 					} else {
 						echo esc_html( $row->email );
