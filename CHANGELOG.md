@@ -7,6 +7,17 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-06-22
+
+### Añadido
+
+- Nueva columna "Acciones" en el log de bounces: botón "Reactivar" si el suscriptor está marcado como rebotado (lo pasa a activo), y botón "Marcar rebotado" si está activo (útil para forzar manualmente lo que el parser no clasificó). Los cambios se aplican sin recargar la página.
+- La dirección de email en el log es ahora un enlace directo a la edición del suscriptor en MailPoet, permitiendo corregir errores tipográficos con un clic. Los registros anteriores muestran el email como texto plano.
+
+### Eliminado
+
+- Columnas "Estado anterior" y "Estado posterior" del log de bounces (vista, exportación CSV y base de datos): nunca se habían utilizado en la práctica. Los datos históricos se eliminan de la base de datos automáticamente al actualizar.
+
 ## [1.4.1] - 2026-06-22
 
 ### Corregido
