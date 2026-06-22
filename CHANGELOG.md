@@ -7,6 +7,15 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Añadido
+
+- El log de bounces muestra ahora el código de diagnóstico SMTP completo (campo `Diagnostic-Code` RFC 3464, o `Status` como fallback). Se ve truncado en la tabla con el texto completo al pasar el ratón, y completo en el CSV.
+- Los bounces por política/reputación (blacklists, bloqueos Outlook, 5.7.x) se guardan con tipo `policy` en lugar de `soft`, tienen filtro propio en el log y se muestran en color diferente. Se incluye migración automática de registros históricos.
+
+### Cambiado
+
+- Los `policy_block` existentes en BD se migran automáticamente a `bounce_type = 'policy'` al activar la nueva versión.
+
 ## [1.3.0] - 2026-06-22
 
 ### Añadido
