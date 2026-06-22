@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-06-22
+
 ### Añadido
 
 - El log de bounces muestra ahora el código de diagnóstico SMTP completo (campo `Diagnostic-Code` RFC 3464, o `Status` como fallback). Se ve truncado en la tabla con el texto completo al pasar el ratón, y completo en el CSV.
