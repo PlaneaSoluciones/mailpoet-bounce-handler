@@ -17,7 +17,8 @@ class MBH_Logger {
 	/**
 	 * Registra una entrada de bounce procesado.
 	 *
-	 * @param array $data Datos del bounce: email, bounce_type, soft_count, action_taken, status_before, status_after, raw_subject.
+	 * @param array $data Datos del bounce: email, bounce_type, soft_count, action_taken,
+	 *                    status_before, status_after, raw_subject, diagnostic_code.
 	 * @return int|false ID insertado o false en caso de error.
 	 */
 	public function log_bounce( array $data ) {
@@ -28,16 +29,17 @@ class MBH_Logger {
 		$inserted = $wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 			$table,
 			array(
-				'processed_at'  => current_time( 'mysql' ),
-				'email'         => sanitize_email( $data['email'] ),
-				'bounce_type'   => $data['bounce_type'],
-				'soft_count'    => (int) ( $data['soft_count'] ?? 0 ),
-				'action_taken'  => sanitize_text_field( $data['action_taken'] ?? '' ),
-				'status_before' => sanitize_text_field( $data['status_before'] ?? '' ),
-				'status_after'  => sanitize_text_field( $data['status_after'] ?? '' ),
-				'raw_subject'   => sanitize_text_field( $data['raw_subject'] ?? '' ),
+				'processed_at'    => current_time( 'mysql' ),
+				'email'           => sanitize_email( $data['email'] ),
+				'bounce_type'     => $data['bounce_type'],
+				'soft_count'      => (int) ( $data['soft_count'] ?? 0 ),
+				'action_taken'    => sanitize_text_field( $data['action_taken'] ?? '' ),
+				'status_before'   => sanitize_text_field( $data['status_before'] ?? '' ),
+				'status_after'    => sanitize_text_field( $data['status_after'] ?? '' ),
+				'raw_subject'     => sanitize_text_field( $data['raw_subject'] ?? '' ),
+				'diagnostic_code' => isset( $data['diagnostic_code'] ) ? sanitize_text_field( $data['diagnostic_code'] ) : null,
 			),
-			array( '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s' )
+			array( '%s', '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' )
 		);
 
 		return $inserted ? $wpdb->insert_id : false;
@@ -137,7 +139,7 @@ class MBH_Logger {
 		$where  = array( '1=1' );
 		$params = array();
 
-		if ( ! empty( $filters['bounce_type'] ) && in_array( $filters['bounce_type'], array( 'hard', 'soft' ), true ) ) {
+		if ( ! empty( $filters['bounce_type'] ) && in_array( $filters['bounce_type'], array( 'hard', 'soft', 'policy' ), true ) ) {
 			$where[]  = 'bounce_type = %s';
 			$params[] = $filters['bounce_type'];
 		}

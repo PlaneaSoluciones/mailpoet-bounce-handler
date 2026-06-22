@@ -307,6 +307,7 @@ class MBH_Admin {
 				__( 'Acción', 'mailpoet-bounce-handler' ),
 				__( 'Estado anterior', 'mailpoet-bounce-handler' ),
 				__( 'Estado posterior', 'mailpoet-bounce-handler' ),
+				__( 'Diagnóstico', 'mailpoet-bounce-handler' ),
 				__( 'Asunto', 'mailpoet-bounce-handler' ),
 			)
 		);
@@ -322,6 +323,7 @@ class MBH_Admin {
 					$row->action_taken,
 					$row->status_before,
 					$row->status_after,
+					$row->diagnostic_code ?? '',
 					$row->raw_subject,
 				)
 			);

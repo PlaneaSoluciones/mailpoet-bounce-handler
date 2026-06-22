@@ -48,6 +48,7 @@ $export_url   = add_query_arg(
 			<option value=""><?php esc_html_e( 'Todos', 'mailpoet-bounce-handler' ); ?></option>
 			<option value="hard" <?php selected( $filters['bounce_type'], 'hard' ); ?>>Hard</option>
 			<option value="soft" <?php selected( $filters['bounce_type'], 'soft' ); ?>>Soft</option>
+			<option value="policy" <?php selected( $filters['bounce_type'], 'policy' ); ?>>Policy</option>
 		</select>
 		&nbsp;
 		<label for="mbh-filter-from"><?php esc_html_e( 'Desde:', 'mailpoet-bounce-handler' ); ?></label>
@@ -76,13 +77,14 @@ $export_url   = add_query_arg(
 	<table class="wp-list-table widefat fixed striped">
 		<thead>
 			<tr>
-				<th style="width:140px"><?php esc_html_e( 'Fecha', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:130px"><?php esc_html_e( 'Fecha', 'mailpoet-bounce-handler' ); ?></th>
 				<th><?php esc_html_e( 'Email', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:70px"><?php esc_html_e( 'Tipo', 'mailpoet-bounce-handler' ); ?></th>
-				<th style="width:80px"><?php esc_html_e( 'Intentos soft', 'mailpoet-bounce-handler' ); ?></th>
-				<th><?php esc_html_e( 'Acción', 'mailpoet-bounce-handler' ); ?></th>
-				<th><?php esc_html_e( 'Estado anterior', 'mailpoet-bounce-handler' ); ?></th>
-				<th><?php esc_html_e( 'Estado posterior', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:60px"><?php esc_html_e( 'Tipo', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:60px"><?php esc_html_e( 'Intentos soft', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:160px"><?php esc_html_e( 'Acción', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:90px"><?php esc_html_e( 'Estado anterior', 'mailpoet-bounce-handler' ); ?></th>
+				<th style="width:90px"><?php esc_html_e( 'Estado posterior', 'mailpoet-bounce-handler' ); ?></th>
+				<th><?php esc_html_e( 'Diagnóstico', 'mailpoet-bounce-handler' ); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -91,7 +93,15 @@ $export_url   = add_query_arg(
 				<td><?php echo esc_html( $row->processed_at ); ?></td>
 				<td><?php echo esc_html( $row->email ); ?></td>
 				<td>
-					<span style="color: <?php echo 'hard' === $row->bounce_type ? '#d63638' : '#dba617'; ?>; font-weight:bold">
+					<?php
+					$type_colors = array(
+						'hard'   => '#d63638',
+						'soft'   => '#dba617',
+						'policy' => '#9b59b6',
+					);
+					$type_color  = $type_colors[ $row->bounce_type ] ?? '#666';
+					?>
+					<span style="color: <?php echo esc_attr( $type_color ); ?>; font-weight:bold">
 						<?php echo esc_html( $row->bounce_type ); ?>
 					</span>
 				</td>
@@ -99,6 +109,16 @@ $export_url   = add_query_arg(
 				<td><?php echo esc_html( $row->action_taken ); ?></td>
 				<td><?php echo esc_html( $row->status_before ); ?></td>
 				<td><?php echo esc_html( $row->status_after ); ?></td>
+				<td>
+					<?php
+					$diag = $row->diagnostic_code ?? '';
+					if ( mb_strlen( $diag ) > 80 ) {
+						echo '<span title="' . esc_attr( $diag ) . '">' . esc_html( mb_substr( $diag, 0, 80 ) ) . '…</span>';
+					} else {
+						echo esc_html( $diag );
+					}
+					?>
+				</td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>
