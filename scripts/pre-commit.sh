@@ -7,12 +7,15 @@ fi
 
 echo "Ejecutando PHPCS..."
 ./vendor/bin/phpcs
-PHPCS_EXIT=$?
+# Comprobación de errores reales (ignorando warnings):
+# PHPCS exit 1 significa cualquier violación (warnings O errors).
+# Ejecutamos de nuevo sin warnings para saber si hay errores reales.
+./vendor/bin/phpcs --warning-severity=0 --no-colors -q > /dev/null 2>&1
+PHPCS_ERRORS=$?
 
-# Exit 0 = sin problemas, 1 = solo warnings (permitido), 2 = errores (bloqueante).
-if [ "$PHPCS_EXIT" -gt 1 ]; then
+if [ "$PHPCS_ERRORS" -ne 0 ]; then
     echo "PHPCS: errores encontrados. Commit bloqueado."
-    exit "$PHPCS_EXIT"
+    exit 1
 fi
 
 echo "PHPCS: sin errores."
