@@ -167,7 +167,7 @@ class MBH_Bounce_Parser {
 	 *
 	 * - 'hard'   → dirección permanentemente inválida (5.1.x, 5.2.x o keywords de usuario inexistente).
 	 * - 'policy' → rechazo por reputación/spam/blacklist (5.7.x, 5.4.x, 5.3.x o keywords de bloqueo).
-	 * - 'soft'   → fallo transitorio (4.x.x) o 5.x.x no clasificado (conservador).
+	 * - 'soft'   → fallo transitorio (4.x.x) o sin código reconocible en el mensaje.
 	 *
 	 * @param string $body Cuerpo completo del mensaje.
 	 * @return string|null 'hard', 'soft', 'policy' o null si no se puede clasificar.
@@ -202,7 +202,22 @@ class MBH_Bounce_Parser {
 			return 'soft';
 		}
 
-		// Diagnostic-Code con código SMTP (ej: "550 5.7.1 ...").
+		// Diagnostic-Code: subcode DSN con notación X.X.X (ej: "#5.1.0", "5.7.1").
+		if ( preg_match( '/Diagnostic-Code:.*\b([45])\.(\d+)\.\d+/i', $body, $m ) ) {
+			if ( '4' === $m[1] ) {
+				return 'soft';
+			}
+			$subclass = (int) $m[2];
+			if ( in_array( $subclass, self::HARD_DSN_SUBCATEGORIES, true ) ) {
+				return 'hard';
+			}
+			if ( in_array( $subclass, self::POLICY_DSN_SUBCATEGORIES, true ) ) {
+				return 'policy';
+			}
+			return 'hard'; // 5.x.x no reconocido → error permanente
+		}
+
+		// Diagnostic-Code: fallback con código SMTP de 3 dígitos (ej: "550", "554").
 		if ( preg_match( '/Diagnostic-Code:.*\b([45])(\d)\d\b/i', $body, $m ) ) {
 			if ( '4' === $m[1] ) {
 				return 'soft';
@@ -215,6 +230,7 @@ class MBH_Bounce_Parser {
 			if ( in_array( $second_digit, self::POLICY_DSN_SUBCATEGORIES, true ) ) {
 				return 'policy';
 			}
+			return 'hard'; // 5xx con subcode no reconocido → error permanente por SMTP spec
 		}
 
 		// Palabras clave de dirección inexistente → hard.
@@ -224,6 +240,8 @@ class MBH_Bounce_Parser {
 			'does not exist',
 			'invalid address',
 			'domain not found',
+			'is disabled',
+			'mailbox disabled',
 		);
 		foreach ( $hard_keywords as $kw ) {
 			if ( str_contains( $body_lower, $kw ) ) {
