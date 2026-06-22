@@ -59,6 +59,17 @@ class MBH_MailPoet_Updater {
 	}
 
 	/**
+	 * Retorna el estado actual de un suscriptor sin modificarlo.
+	 *
+	 * @param string $email Dirección de correo.
+	 * @return string|null Estado del suscriptor o null si no existe.
+	 */
+	public function get_subscriber_status( string $email ): ?string {
+		$subscriber = $this->get_subscriber( $email );
+		return null !== $subscriber ? ( $subscriber['status'] ?? 'unknown' ) : null;
+	}
+
+	/**
 	 * Obtiene el email reply-to configurado en MailPoet.
 	 * Retorna null si no está configurado.
 	 *

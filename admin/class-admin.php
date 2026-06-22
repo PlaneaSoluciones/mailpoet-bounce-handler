@@ -101,7 +101,8 @@ class MBH_Admin {
 			'mbh_soft_threshold'     => array( 'absint', 3 ),
 			'mbh_cron_frequency'     => array( 'sanitize_text_field', 'hourly' ),
 			'mbh_notify_email'       => array( 'sanitize_email', '' ),
-			'mbh_log_retention_days' => array( 'absint', 90 ),
+			'mbh_log_retention_days' => array( 'absint', 0 ),
+			'mbh_log_max_rows'       => array( 'absint', 10000 ),
 		);
 
 		foreach ( $options as $key => list( $sanitize, $default ) ) {

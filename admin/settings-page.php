@@ -17,7 +17,10 @@ $imap_user    = get_option( 'mbh_imap_user', '' );
 $threshold    = get_option( 'mbh_soft_threshold', 3 );
 $cron_freq    = get_option( 'mbh_cron_frequency', 'hourly' );
 $notify_email = get_option( 'mbh_notify_email', '' );
-$retention    = get_option( 'mbh_log_retention_days', 90 );
+$retention    = get_option( 'mbh_log_retention_days', 0 );
+$max_rows     = get_option( 'mbh_log_max_rows', 10000 );
+$logger       = new MBH_Logger();
+$log_total    = $logger->get_logs( array(), 1, 1 )['total'];
 
 if ( ! $notify_email ) {
 	$updater      = new MBH_MailPoet_Updater();
@@ -165,7 +168,27 @@ $has_imap_extension = extension_loaded( 'imap' );
 				<td>
 					<input type="number" id="mbh_log_retention_days" name="mbh_log_retention_days"
 						value="<?php echo esc_attr( $retention ); ?>"
-						class="small-text" min="1" max="3650">
+						class="small-text" min="0" max="3650">
+					<p class="description"><?php esc_html_e( 'Elimina entradas más antiguas que este número de días al finalizar cada procesado. 0 = desactivado.', 'mailpoet-bounce-handler' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="mbh_log_max_rows"><?php esc_html_e( 'Máximo de entradas en el log', 'mailpoet-bounce-handler' ); ?></label></th>
+				<td>
+					<input type="number" id="mbh_log_max_rows" name="mbh_log_max_rows"
+						value="<?php echo esc_attr( $max_rows ); ?>"
+						class="small-text" min="0" max="1000000">
+					<p class="description">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* translators: %d: número actual de filas en el log */
+								__( 'Mantiene solo las N entradas más recientes, borrando las más antiguas. 0 = sin límite. Actualmente hay %d entradas en el log.', 'mailpoet-bounce-handler' ),
+								$log_total
+							)
+						);
+						?>
+					</p>
 				</td>
 			</tr>
 		</table>
