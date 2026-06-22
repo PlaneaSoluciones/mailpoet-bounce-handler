@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-22
+
 ### Añadido
 
 - El log de bounces ahora muestra el estado del suscriptor en MailPoet ("Estado anterior" / "Estado posterior") también para soft bounces parciales y bloqueos por política, no solo cuando se marca al suscriptor como bounced.
