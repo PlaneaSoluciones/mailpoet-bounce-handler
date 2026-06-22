@@ -297,14 +297,15 @@ function mbh_run_bounce_processing(): array {
 
 				$results['soft_threshold_reached'][] = array( 'email' => $email );
 			} else {
+				$current_status = $updater->get_subscriber_status( $email ) ?? '';
 				$logger->log_bounce(
 					array(
 						'email'         => $email,
 						'bounce_type'   => 'soft',
 						'soft_count'    => $soft_count,
 						'action_taken'  => 'soft_count_incremented',
-						'status_before' => '',
-						'status_after'  => '',
+						'status_before' => $current_status,
+						'status_after'  => $current_status,
 						'raw_subject'   => $subject,
 					)
 				);
@@ -313,14 +314,15 @@ function mbh_run_bounce_processing(): array {
 			}
 		} elseif ( 'policy' === $type ) {
 			// Bloqueo por política/reputación: no marcar el suscriptor, solo registrar y alertar.
+			$current_status = $updater->get_subscriber_status( $email ) ?? '';
 			$logger->log_bounce(
 				array(
 					'email'         => $email,
 					'bounce_type'   => 'soft',
 					'soft_count'    => 0,
 					'action_taken'  => 'policy_block',
-					'status_before' => '',
-					'status_after'  => '',
+					'status_before' => $current_status,
+					'status_after'  => $current_status,
 					'raw_subject'   => $subject,
 				)
 			);
