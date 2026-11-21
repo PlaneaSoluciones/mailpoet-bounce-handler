@@ -7,6 +7,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-11-21
+
 ### Cambiado
 
 - Requiere PHP 8.2 o superior (PHP 8.0 y 8.1 ya no reciben soporte de seguridad). Compatible hasta PHP 8.5.
@@ -148,7 +150,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 - Corregidas violaciones de estilo PHPCS/WPCS y ajustada la configuración del linter.
 - El ZIP del release ahora incluye el número de versión en el nombre del archivo, manteniendo la carpeta interna con el slug del plugin para que WordPress sustituya la instalación anterior.
 
-[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.5.0...v1.6.0

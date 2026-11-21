@@ -3,7 +3,7 @@ Contributors: planeasoluciones
 Tags: mailpoet, bounces, imap, email, bounce handler
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 Requires PHP: 8.2
 Requires Plugins: mailpoet
 License: GPL-2.0-or-later
@@ -71,6 +71,11 @@ Settings and cron jobs are independent per site. The plugin has not been specifi
 2. Bounce log — filterable table with diagnostic codes, bounce types, and action buttons.
 
 == Changelog ==
+
+= 1.8.0 =
+* Changed: Requires PHP 8.2 or later (PHP 8.0 and 8.1 no longer get security fixes). Compatible up to PHP 8.5.
+* Changed: Tested up to WordPress 7.1.
+* Fixed: Updates from GitHub are now also detected in the background (WP-Cron) and from MainWP, not only when opening the WordPress dashboard.
 
 = 1.7.0 =
 * Added: Automatic updates from GitHub Releases: WordPress shows new versions in the Plugins screen and installs them with one click.
