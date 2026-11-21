@@ -7,6 +7,15 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Cambiado
+
+- Requiere PHP 8.2 o superior (PHP 8.0 y 8.1 ya no reciben soporte de seguridad). Compatible hasta PHP 8.5.
+- Probado hasta WordPress 7.1.
+
+### Corregido
+
+- Las actualizaciones desde GitHub también se detectan en segundo plano (WP-Cron) y desde MainWP, no solo al entrar en el escritorio de WordPress
+
 ## [1.7.0] - 2026-11-21
 
 ### Añadido

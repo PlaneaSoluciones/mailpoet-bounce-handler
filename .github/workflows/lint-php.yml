@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ["8.1", "8.2", "8.3", "8.4", "8.5"]
+        php: ["8.2", "8.3", "8.4", "8.5"]
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.5"
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
       # Requiere phpcs.xml en la raíz del proyecto con las reglas configuradas
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.5"
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
       # Level 5 por defecto; ajustar en phpstan.neon del proyecto si es necesario
