@@ -2,9 +2,9 @@
 Contributors: planeasoluciones
 Tags: mailpoet, bounces, imap, email, bounce handler
 Requires at least: 6.2
-Tested up to: 7.1.5
+Tested up to: 7.1
 Stable tag: 1.7.0
-Requires PHP: 8.1
+Requires PHP: 8.2
 Requires Plugins: mailpoet
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
