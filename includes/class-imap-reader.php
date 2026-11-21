@@ -15,9 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class MBH_IMAP_Reader {
 
 	/**
-	 * Stream IMAP activo.
+	 * Conexión IMAP activa.
 	 *
-	 * @var resource|false
+	 * @var \IMAP\Connection|false
 	 */
 	private $stream = false;
 
@@ -111,7 +111,7 @@ class MBH_IMAP_Reader {
 			return;
 		}
 
-		imap_delete( $this->stream, $msg_num );
+		imap_delete( $this->stream, (string) $msg_num );
 	}
 
 	/**

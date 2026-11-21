@@ -7,11 +7,11 @@ Plugin WordPress para gestión automática de bounces IMAP en instalaciones con 
 ## Comandos
 
 ```bash
-# Instalar dependencias de desarrollo y configurar git hook
+# Instalar dependencias y activar el hook .githooks/pre-commit (gitleaks + PHPCS)
 composer install
 
-# Ejecutar linter
-composer lint
+# PHPCS + PHPStan (obligatorio antes de cada bump)
+composer check
 
 # Corregir automáticamente lo que PHPCS pueda arreglar
 composer lint:fix
@@ -50,18 +50,44 @@ languages/
 
 **Multisite:** ajustes con `get_option/update_option` (independientes por sitio). Cron registrado en contexto de cada blog.
 
+## Actualizaciones automáticas
+
+[Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker) v6
+(`yahnis-elsts/plugin-update-checker`, única dependencia de producción en `composer.json`). En
+`mailpoet-bounce-handler.php`, solo en `is_admin()`, `PucFactory::buildUpdateChecker()` apunta al
+repo de GitHub con `enableReleaseAssets()`: WordPress ofrece la actualización nativa usando el ZIP
+adjunto a la Release, no el código crudo del tag.
+
+- Requiere que el repo siga siendo público; si pasa a privado, `setAuthentication()` con token.
+- Sin `vendor/autoload.php` (clon sin `composer install`) el chequeo no se activa y el resto funciona.
+- Por eso el ZIP sí lleva `vendor/`, pero solo el de `composer install --no-dev` (solo PUC).
+
+## Workflows
+
+- `pr-title-lint.yml` — título del PR en Conventional Commits
+- `secret-scan.yml` — gitleaks en cada push/PR
+- `lint-php.yml` — `php -l` en matriz 8.1–8.5 + PHPCS + PHPStan (nivel 5, `phpVersion: 80100`)
+- `release-php.yml` — al pushear un tag `v*`: `composer install --no-dev`, ZIP
+  `mailpoet-bounce-handler.zip`, notas desde `CHANGELOG.md` y GitHub Release
+- `.github/dependabot.yml` — Composer y Actions, semanal (lunes)
+
 ## Releases
 
 `CHANGELOG.md` se mantiene actualizado de forma continua, no solo al taggear: cada commit `feat:`/`fix:` añade su entrada en `## [Unreleased]` en el momento del cambio (formato Keep a Changelog).
 
-Antes de taggear: mover el contenido de `[Unreleased]` a una nueva sección `## [X.Y.Z] - AAAA-MM-DD`. El workflow extrae esa sección con `awk` y la usa como notas del release — si no encuentra la sección para la versión taggeada, falla el build.
+Bump en su propio PR (`chore: bump version to X.Y.Z`): cabecera `Version:` y `MBH_VERSION` en
+`mailpoet-bounce-handler.php`, `Stable tag:` y `== Changelog ==` en `readme.txt`, y mover
+`[Unreleased]` a `## [X.Y.Z] - AAAA-MM-DD` en `CHANGELOG.md` (si el workflow no encuentra la
+sección, falla). Tras el merge, en `main` actualizado:
 
 ```bash
 git tag vX.Y.Z
-git push && git push --tags
+git push origin vX.Y.Z
 ```
 
-Trigger: `push: tags: v*` en `.github/workflows/release.yml`.
+## Pendientes
+
+- Crear página en BookStack y enlazarla aquí.
 
 ## Documentación operacional
 
