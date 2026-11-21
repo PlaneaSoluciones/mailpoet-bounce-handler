@@ -3,7 +3,7 @@ Contributors: planeasoluciones
 Tags: mailpoet, bounces, imap, email, bounce handler
 Requires at least: 6.2
 Tested up to: 7.1.5
-Stable tag: 1.6.1
+Stable tag: 1.7.0
 Requires PHP: 8.1
 Requires Plugins: mailpoet
 License: GPL-2.0-or-later
@@ -71,6 +71,12 @@ Settings and cron jobs are independent per site. The plugin has not been specifi
 2. Bounce log — filterable table with diagnostic codes, bounce types, and action buttons.
 
 == Changelog ==
+
+= 1.7.0 =
+* Added: Automatic updates from GitHub Releases: WordPress shows new versions in the Plugins screen and installs them with one click.
+* Changed: Tested up to WordPress 7.1.5.
+* Fixed: The internal plugin version was still 1.6.0 after releasing 1.6.1, so browsers could keep using cached admin styles and scripts.
+* Fixed: The WP-Cron processing callback no longer returns a value to WordPress.
 
 = 1.5.0 =
 * Added "Actions" column in the bounce log: reactivate a bounced subscriber or force-mark an active one as bounced, without reloading the page.
