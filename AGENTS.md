@@ -66,7 +66,7 @@ adjunto a la Release, no el código crudo del tag.
 
 - `pr-title-lint.yml` — título del PR en Conventional Commits
 - `secret-scan.yml` — gitleaks en cada push/PR
-- `lint-php.yml` — `php -l` en matriz 8.1–8.5 + PHPCS + PHPStan (nivel 5, `phpVersion: 80100`)
+- `lint-php.yml` — `php -l` en matriz 8.2–8.5 + PHPCS + PHPStan (nivel 5, `phpVersion: 80200`), con PHP 8.5 en PHPCS, PHPStan y release
 - `release-php.yml` — al pushear un tag `v*`: `composer install --no-dev`, ZIP
   `mailpoet-bounce-handler.zip`, notas desde `CHANGELOG.md` y GitHub Release
 - `.github/dependabot.yml` — Composer y Actions, semanal (lunes)
@@ -87,6 +87,7 @@ git push origin vX.Y.Z
 
 ## Pendientes
 
+- PHPCS 4 (`squizlabs/php_codesniffer` ^4): bloqueado mientras WPCS exija PHPCS ^3; subirlo cuando salga una WPCS compatible.
 - Crear página en BookStack y enlazarla aquí.
 
 ## Documentación operacional
