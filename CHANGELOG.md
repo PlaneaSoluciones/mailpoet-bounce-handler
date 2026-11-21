@@ -7,6 +7,19 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 
 ## [Unreleased]
 
+### Añadido
+
+- Actualizaciones automáticas desde las Releases de GitHub: WordPress avisa de las versiones nuevas en el listado de plugins y se instalan con un clic.
+
+### Cambiado
+
+- Probado hasta WordPress 7.1.5.
+
+### Corregido
+
+- La versión interna del plugin seguía en 1.6.0 tras publicar la 1.6.1, por lo que el navegador podía seguir usando los estilos y scripts del panel en caché.
+- El procesado programado por WP-Cron ya no devuelve un valor a WordPress (las acciones no deben devolver nada).
+
 ## [1.6.1] - 2026-06-22
 
 ### Corregido
@@ -124,7 +137,8 @@ y este proyecto se adhiere a [Versionado Semántico](https://semver.org/lang/es/
 - Corregidas violaciones de estilo PHPCS/WPCS y ajustada la configuración del linter.
 - El ZIP del release ahora incluye el número de versión en el nombre del archivo, manteniendo la carpeta interna con el slug del plugin para que WordPress sustituya la instalación anterior.
 
-[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/compare/v1.4.0...v1.4.1

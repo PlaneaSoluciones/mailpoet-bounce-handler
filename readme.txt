@@ -2,7 +2,7 @@
 Contributors: planeasoluciones
 Tags: mailpoet, bounces, imap, email, bounce handler
 Requires at least: 6.2
-Tested up to: 6.8
+Tested up to: 7.1.5
 Stable tag: 1.6.1
 Requires PHP: 8.1
 Requires Plugins: mailpoet

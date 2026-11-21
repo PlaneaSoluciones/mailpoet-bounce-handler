@@ -170,9 +170,9 @@ class MBH_Bounce_Parser {
 	 * - 'soft'   → fallo transitorio (4.x.x) o sin código reconocible en el mensaje.
 	 *
 	 * @param string $body Cuerpo completo del mensaje.
-	 * @return string|null 'hard', 'soft', 'policy' o null si no se puede clasificar.
+	 * @return string 'hard', 'soft' o 'policy'.
 	 */
-	private function classify_bounce( string $body ): ?string {
+	private function classify_bounce( string $body ): string {
 		$body_lower = strtolower( $body );
 
 		// Status DSN (RFC 3464): "Status: 5.1.1" o "Status: 4.2.2".

@@ -1,0 +1,15 @@
+#!/bin/sh
+if ! command -v gitleaks > /dev/null 2>&1; then
+  echo "❌ gitleaks no encontrado. Instala con: winget install gitleaks"
+  exit 1
+fi
+echo "==> gitleaks (pre-commit)"
+gitleaks protect --staged --redact -v || exit 1
+
+if [ ! -f vendor/bin/phpcs ]; then
+  echo "❌ PHPCS no encontrado. Ejecuta: composer install"
+  exit 1
+fi
+# Solo bloquean los errores; los warnings se muestran pero no impiden el commit.
+echo "==> phpcs (pre-commit)"
+vendor/bin/phpcs --warning-severity=0 -q || exit 1

@@ -41,7 +41,7 @@ Desde la página de ajustes del plugin se configuran:
 
 ## Desarrollo
 
-Arquitectura del código, comandos de lint, convenciones de nombres y flujo de releases: ver [`CLAUDE.md`](CLAUDE.md).
+Arquitectura del código, comandos de lint, convenciones de nombres y flujo de releases: ver [`AGENTS.md`](AGENTS.md).
 
 ## Historial de cambios
 

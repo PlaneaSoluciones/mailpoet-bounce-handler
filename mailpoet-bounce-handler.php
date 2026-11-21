@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: MailPoet Bounce Handler
- * Plugin URI:  https://github.com/PlanaSoluciones/mailpoet-bounce-handler
+ * Plugin URI:  https://github.com/PlaneaSoluciones/mailpoet-bounce-handler
  * Description: Gestión automática de bounces IMAP/POP3 para MailPoet 3. Requiere MailPoet 3 instalado y activo.
  * Version:     1.6.1
  * Author:      Planea Soluciones
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MBH_VERSION', '1.6.0' );
+define( 'MBH_VERSION', '1.6.1' );
 define( 'MBH_PLUGIN_FILE', __FILE__ );
 define( 'MBH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 
@@ -31,6 +31,21 @@ require_once MBH_PLUGIN_DIR . 'includes/class-bounce-parser.php';
 require_once MBH_PLUGIN_DIR . 'includes/class-mailpoet-updater.php';
 require_once MBH_PLUGIN_DIR . 'includes/class-logger.php';
 require_once MBH_PLUGIN_DIR . 'includes/class-notifier.php';
+
+// Actualizaciones desde las Releases de GitHub. Sin vendor/ (clon sin composer install) no se activa.
+if ( is_admin() && file_exists( MBH_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	require_once MBH_PLUGIN_DIR . 'vendor/autoload.php';
+
+	$mbh_update_checker = \YahnisElsts\PluginUpdateChecker\v6\PucFactory::buildUpdateChecker(
+		'https://github.com/PlaneaSoluciones/mailpoet-bounce-handler/',
+		__FILE__,
+		'mailpoet-bounce-handler'
+	);
+
+	// enableReleaseAssets() solo existe en la API concreta de GitHub, cuyo namespace interno
+	// cambia con cada versión de la librería (v6p0...): se ignora en phpstan.neon.
+	$mbh_update_checker->getVcsApi()->enableReleaseAssets();
+}
 
 // Carga diferida del área admin.
 if ( is_admin() ) {
@@ -200,7 +215,14 @@ function mbh_schedule_cron(): void {
 	wp_schedule_event( time(), $frequency, 'mbh_process_bounces' );
 }
 
-add_action( 'mbh_process_bounces', 'mbh_run_bounce_processing' );
+add_action( 'mbh_process_bounces', 'mbh_cron_process_bounces' );
+
+/**
+ * Callback del cron: las acciones no devuelven valor, el resumen solo lo usa el botón manual.
+ */
+function mbh_cron_process_bounces(): void {
+	mbh_run_bounce_processing();
+}
 
 /**
  * Punto de entrada del procesado de bounces (cron y manual).
