@@ -1,7 +1,11 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
 parameters:
     level: 5
+    phpVersion: 80100
     bootstrapFiles:
-        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - phpstan-bootstrap.php
     paths:
         - mailpoet-bounce-handler.php
         - includes/
@@ -9,3 +13,8 @@ parameters:
         - uninstall.php
     excludePaths:
         - vendor/
+    ignoreErrors:
+        -
+            identifier: method.notFound
+            message: '#enableReleaseAssets\(\)#'
+            path: mailpoet-bounce-handler.php

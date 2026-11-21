@@ -1,0 +1,23 @@
+name: Lint PR title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validar título (Conventional Commits)
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|docs|chore|refactor|perf|test|build)(\(.+\))?: .+'
+          if ! echo "$TITLE" | grep -qE "$pattern"; then
+            echo "El título del PR no sigue Conventional Commits."
+            echo "Formato: tipo: descripción  (o tipo(scope): descripción)"
+            echo "Tipos válidos: feat, fix, docs, chore, refactor, perf, test, build"
+            echo "Título actual: $TITLE"
+            exit 1
+          fi
+          echo "Título correcto: $TITLE"
