@@ -54,7 +54,7 @@ languages/
 
 [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker) v6
 (`yahnis-elsts/plugin-update-checker`, única dependencia de producción en `composer.json`). En
-`mailpoet-bounce-handler.php`, solo en `is_admin()`, `PucFactory::buildUpdateChecker()` apunta al
+`mailpoet-bounce-handler.php`, en todas las peticiones (WP-Cron y MainWP también tienen que ver la actualización), `PucFactory::buildUpdateChecker()` apunta al
 repo de GitHub con `enableReleaseAssets()`: WordPress ofrece la actualización nativa usando el ZIP
 adjunto a la Release, no el código crudo del tag.
 

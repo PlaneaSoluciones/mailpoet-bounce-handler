@@ -33,7 +33,9 @@ require_once MBH_PLUGIN_DIR . 'includes/class-logger.php';
 require_once MBH_PLUGIN_DIR . 'includes/class-notifier.php';
 
 // Actualizaciones desde las Releases de GitHub. Sin vendor/ (clon sin composer install) no se activa.
-if ( is_admin() && file_exists( MBH_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+// Se carga en todas las peticiones, no solo en wp-admin: WP-Cron y la sincronización de MainWP
+// también tienen que ver la actualización.
+if ( file_exists( MBH_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
 	require_once MBH_PLUGIN_DIR . 'vendor/autoload.php';
 
 	$mbh_update_checker = \YahnisElsts\PluginUpdateChecker\v6\PucFactory::buildUpdateChecker(
